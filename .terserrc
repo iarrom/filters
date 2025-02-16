@@ -1,0 +1,23 @@
+{
+  "compress": {
+    "passes": 2,
+    "dead_code": true,
+    "drop_console": true,
+    "drop_debugger": true,
+    "pure_funcs": [
+      "console.log",
+      "console.info",
+      "console.debug"
+    ],
+    "pure_getters": true,
+    "unsafe": true,
+    "unsafe_math": true,
+    "unsafe_proto": true
+  },
+  "mangle": {
+    "properties": false
+  },
+  "format": {
+    "comments": false
+  }
+}

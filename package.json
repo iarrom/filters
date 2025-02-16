@@ -2,14 +2,14 @@
   "name": "wized-filter-and-pagination",
   "version": "1.0.5",
   "description": "Wized filter and pagination functionality",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/index.min.js",
+  "module": "dist/index.js",
   "source": "src/index.js",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js",
+      "require": "./dist/index.min.js"
     }
   },
   "files": [
@@ -23,8 +23,8 @@
   },
   "author": "Aonnoy Sengupta",
   "scripts": {
-    "start": "parcel watch",
-    "build": "parcel build",
+    "start": "parcel serve src/filter-main.js --port 3001 --open",
+    "build": "NODE_ENV=production parcel build src/index.js --no-source-maps --no-cache --detailed-report && terser dist/index.js -c -m -o dist/index.min.js",
     "build:dev": "parcel build --no-optimize",
     "clean": "rm -rf dist .parcel-cache",
     "lint": "eslint .",
@@ -81,6 +81,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^15.2.0",
     "parcel": "^2.13.3",
-    "prettier": "^3.5.1"
+    "prettier": "^3.5.1",
+    "terser": "^5.27.2"
   }
 }

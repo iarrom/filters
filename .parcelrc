@@ -9,5 +9,22 @@
     "*.js": [
       "@parcel/optimizer-terser"
     ]
+  },
+  "compressors": {
+    "*.{js,css,html,svg}": [
+      "@parcel/compressor-gzip",
+      "@parcel/compressor-brotli"
+    ]
+  },
+  "packagers": {
+    "*.js": "@parcel/packager-js"
+  },
+  "reporters": [
+    "@parcel/reporter-cli"
+  ],
+  "optimization": {
+    "minimize": true,
+    "scope-hoisting": true,
+    "tree-shaking": true
   }
 }

@@ -1,0 +1,15 @@
+{
+  "extends": "@parcel/config-default",
+  "transformers": {
+    "*.{js,mjs}": ["@parcel/transformer-js"]
+  },
+  "optimizers": {
+    "*.js": ["@parcel/optimizer-terser"]
+  },
+  "compressors": {
+    "*.{js,css,html,svg}": ["@parcel/compressor-gzip", "@parcel/compressor-brotli"]
+  },
+  "packagers": {
+    "*.js": "@parcel/packager-js"
+  }
+}
