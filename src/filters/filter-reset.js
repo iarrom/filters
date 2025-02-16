@@ -233,9 +233,15 @@ export default class FilterResetManager {
 }
 
 // Initialize Wized and the FilterResetManager
-if (typeof window !== 'undefined') {
-  window.Wized = window.Wized || [];
-  window.Wized.push((Wized) => {
-    new FilterResetManager(Wized);
-  });
+if (typeof window !== 'undefined' && !window.__TESTING__) {
+  if (!Array.isArray(window.Wized)) {
+    window.Wized = [];
+  }
+  if (typeof window.Wized.push === 'function') {
+    window.Wized.push((Wized) => {
+      new FilterResetManager(Wized);
+    });
+  } else {
+    console.warn('Wized initialization queue not available');
+  }
 }

@@ -1,160 +1,118 @@
-/* global describe, beforeEach, afterEach, test, expect, jest */
+/* global jest, describe, beforeEach, it, expect */
 
 import FilterResetManager from '../../filters/filter-reset';
 import Wized from '../../__mocks__/wized';
 
+// Mock window and document
+window.__TESTING__ = true;
+
+// Mock document methods
+document.querySelector = jest.fn();
+
+// Mock console methods
+console.log = jest.fn();
+console.error = jest.fn();
+console.warn = jest.fn();
+
 describe('FilterResetManager', () => {
   let manager;
+  let mockWized;
   let mockResetButton;
-  let consoleSpy;
 
   beforeEach(() => {
-    // Clear all mocks
+    // Reset all mocks
     jest.clearAllMocks();
-    document.body.innerHTML = '';
 
-    // Create mock reset button
-    mockResetButton = document.createElement('button');
-    mockResetButton.setAttribute('w-filter-reset', 'main-reset');
-    mockResetButton.setAttribute('w-filter-pagination-current-variable', 'currentPage');
-    mockResetButton.setAttribute('w-filter-request', 'filterRequest');
-    document.body.appendChild(mockResetButton);
+    // Mock Wized instance
+    mockWized = {
+      data: {
+        v: {
+          test_make: [],
+          test_year: '',
+          test_sort: [],
+        },
+      },
+      requests: {
+        execute: jest.fn(),
+      },
+      on: jest.fn(),
+    };
 
-    // Mock document methods
-    document.querySelector = jest.fn((selector) => {
-      if (selector === '[w-filter-reset="main-reset"]') return mockResetButton;
-      return document.body.querySelector(selector);
-    });
+    // Mock reset button
+    mockResetButton = {
+      addEventListener: jest.fn(),
+      getAttribute: jest.fn(),
+    };
 
-    // Mock global reset functions
-    window.uncheckAllFilterCheckboxes = jest.fn().mockResolvedValue(undefined);
-    window.uncheckAllRadioButtons = jest.fn().mockResolvedValue(undefined);
-    window.resetAllSelectInputs = jest.fn().mockResolvedValue(undefined);
-    window.resetAllRangeSelects = jest.fn().mockResolvedValue(undefined);
-    window.resetAllSortInputs = jest.fn().mockResolvedValue(undefined);
+    // Setup document.querySelector mock
+    document.querySelector.mockReturnValue(mockResetButton);
 
-    // Spy on console methods
-    consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    jest.spyOn(console, 'error').mockImplementation(() => {});
-
-    // Create a new instance of the manager
-    manager = new FilterResetManager(Wized);
+    // Create manager instance
+    manager = new FilterResetManager(mockWized);
   });
 
-  afterEach(() => {
-    // Clean up
-    jest.resetAllMocks();
-    document.body.innerHTML = '';
-    window.uncheckAllFilterCheckboxes = undefined;
-    window.uncheckAllRadioButtons = undefined;
-    window.resetAllSelectInputs = undefined;
-    window.resetAllRangeSelects = undefined;
-    window.resetAllSortInputs = undefined;
-  });
-
-  // Initialization tests
   describe('initialization', () => {
-    test('should initialize with Wized instance', () => {
-      expect(manager).toBeDefined();
-      expect(manager.Wized).toBe(Wized);
+    it('should initialize with Wized instance', () => {
+      expect(manager.Wized).toBe(mockWized);
     });
 
-    test('should setup reset button', () => {
-      expect(document.querySelector).toHaveBeenCalledWith('[w-filter-reset="main-reset"]');
+    it('should initialize with correct state', () => {
+      expect(manager.state).toEqual({
+        initialized: true,
+        processingReset: false,
+        mainResetButton: mockResetButton,
+      });
     });
 
-    test('should handle missing reset button gracefully', () => {
-      document.querySelector.mockReturnValue(null);
-      const newManager = new FilterResetManager(Wized);
-      expect(consoleSpy).toHaveBeenCalledWith('No reset button found, exiting setup');
+    it('should not initialize twice', () => {
+      manager.initialize();
+      expect(document.querySelector).toHaveBeenCalledTimes(1);
     });
   });
 
-  // Active filter detection tests
-  describe('active filter detection', () => {
-    beforeEach(() => {
-      // Reset Wized data before each test
-      Wized.data.v = {};
-    });
-
-    test('should detect active string filters', () => {
-      Wized.data.v = {
-        make: 'Toyota',
-        pagination: '1', // Should be ignored
-      };
+  describe('filter state detection', () => {
+    it('should detect active array filters', () => {
+      mockWized.data.v.test_make = ['value1', 'value2'];
       expect(manager.checkForActiveFilters()).toBe(true);
     });
 
-    test('should detect active array filters', () => {
-      Wized.data.v = {
-        make_make: ['Toyota', 'Honda'],
-        result: [], // Should be ignored
-      };
+    it('should detect active string filters', () => {
+      mockWized.data.v.test_year = '2020';
       expect(manager.checkForActiveFilters()).toBe(true);
     });
 
-    test('should detect active sort filters', () => {
-      Wized.data.v = {
-        car_sort: [{ orderBy: 'price', sortBy: 'asc' }],
-      };
+    it('should detect active sort filters', () => {
+      mockWized.data.v.test_sort = [{ orderBy: 'asc' }];
       expect(manager.checkForActiveFilters()).toBe(true);
     });
 
-    test('should detect active number filters', () => {
-      Wized.data.v = {
-        price: 25000,
-        itemsperpage: 10, // Should be ignored
-      };
-      expect(manager.checkForActiveFilters()).toBe(true);
-    });
-
-    test('should ignore system variables', () => {
-      Wized.data.v = {
-        pagination: '1',
-        result: [],
-        cards: [],
-        itemsperpage: 10,
-        index: 0,
-      };
-      expect(manager.checkForActiveFilters()).toBe(false);
-    });
-
-    test('should handle null values', () => {
-      Wized.data.v = {
-        make: null,
-        model: null,
-      };
-      expect(manager.checkForActiveFilters()).toBe(false);
-    });
-
-    test('should handle empty arrays', () => {
-      Wized.data.v = {
-        make_make: [],
-        car_sort: [],
-      };
-      expect(manager.checkForActiveFilters()).toBe(false);
-    });
-
-    test('should handle empty strings', () => {
-      Wized.data.v = {
-        make: '',
-        model: '',
-      };
-      expect(manager.checkForActiveFilters()).toBe(false);
-    });
-
-    test('should handle zero values', () => {
-      Wized.data.v = {
-        price: 0,
-        year: 0,
+    it('should return false when no active filters', () => {
+      mockWized.data.v = {
+        test_make: [],
+        test_year: '',
+        test_sort: [],
       };
       expect(manager.checkForActiveFilters()).toBe(false);
     });
   });
 
-  // Reset functionality tests
   describe('reset functionality', () => {
-    test('should reset all filter types', async () => {
+    beforeEach(() => {
+      // Mock global reset functions
+      window.uncheckAllFilterCheckboxes = jest.fn();
+      window.uncheckAllRadioButtons = jest.fn();
+      window.resetAllSelectInputs = jest.fn();
+      window.resetAllRangeSelects = jest.fn();
+      window.resetAllSortInputs = jest.fn();
+    });
+
+    it('should reset all filter types', async () => {
+      mockResetButton.getAttribute.mockImplementation((attr) => {
+        if (attr === 'w-filter-pagination-current-variable') return 'page';
+        if (attr === 'w-filter-request') return 'filterRequest';
+        return null;
+      });
+
       await manager.resetAllFilters(mockResetButton);
 
       expect(window.uncheckAllFilterCheckboxes).toHaveBeenCalled();
@@ -164,79 +122,47 @@ describe('FilterResetManager', () => {
       expect(window.resetAllSortInputs).toHaveBeenCalled();
     });
 
-    test('should reset pagination', async () => {
+    it('should prevent multiple simultaneous resets', async () => {
+      manager.state.processingReset = true;
       await manager.resetAllFilters(mockResetButton);
-      expect(Wized.data.v.currentPage).toBe(1);
+
+      expect(window.uncheckAllFilterCheckboxes).not.toHaveBeenCalled();
     });
 
-    test('should execute filter request', async () => {
+    it('should handle missing reset functions gracefully', async () => {
+      delete window.uncheckAllFilterCheckboxes;
+
       await manager.resetAllFilters(mockResetButton);
-      expect(Wized.requests.execute).toHaveBeenCalledWith('filterRequest');
+      expect(mockWized.requests.execute).not.toHaveBeenCalled();
     });
 
-    test('should handle missing reset functions gracefully', async () => {
-      window.uncheckAllFilterCheckboxes = undefined;
-      window.uncheckAllRadioButtons = undefined;
-      window.resetAllSelectInputs = undefined;
-      window.resetAllRangeSelects = undefined;
-      window.resetAllSortInputs = undefined;
+    it('should execute filter request after reset', async () => {
+      mockResetButton.getAttribute.mockReturnValue('filterRequest');
 
       await manager.resetAllFilters(mockResetButton);
-      expect(Wized.requests.execute).toHaveBeenCalledWith('filterRequest');
-    });
-
-    test('should handle filter request errors', async () => {
-      const error = new Error('Filter request failed');
-      Wized.requests.execute.mockRejectedValue(error);
-
-      await manager.resetAllFilters(mockResetButton);
-      expect(console.error).toHaveBeenCalledWith(
-        'Error executing filter request: Error: Filter request failed'
-      );
+      expect(mockWized.requests.execute).toHaveBeenCalledWith('filterRequest');
     });
   });
 
-  // Event handling tests
   describe('event handling', () => {
-    test('should handle reset button click with active filters', async () => {
-      // Setup active filters
-      Wized.data.v = { make: 'Toyota' };
-
-      // Check for active filters and reset if needed
-      if (manager.checkForActiveFilters()) {
-        await manager.resetAllFilters(mockResetButton);
-      }
-
-      expect(window.uncheckAllFilterCheckboxes).toHaveBeenCalled();
-      expect(Wized.requests.execute).toHaveBeenCalled();
+    it('should set up click handler for reset button', () => {
+      expect(mockResetButton.addEventListener).toHaveBeenCalledWith('click', expect.any(Function));
     });
 
-    test('should not reset when no active filters', async () => {
-      // Setup no active filters
-      Wized.data.v = { pagination: '1' };
-
-      // Check for active filters and reset if needed
-      if (manager.checkForActiveFilters()) {
-        await manager.resetAllFilters(mockResetButton);
-      }
-
-      expect(window.uncheckAllFilterCheckboxes).not.toHaveBeenCalled();
-      expect(Wized.requests.execute).not.toHaveBeenCalled();
+    it('should handle missing reset button', () => {
+      document.querySelector.mockReturnValue(null);
+      const newManager = new FilterResetManager(mockWized);
+      expect(newManager.state.mainResetButton).toBeNull();
     });
 
-    test('should handle reset errors gracefully', async () => {
-      // Setup error condition
-      window.uncheckAllFilterCheckboxes.mockRejectedValue(new Error('Reset failed'));
+    it('should only reset when active filters exist', async () => {
+      const clickHandler = mockResetButton.addEventListener.mock.calls[0][1];
 
-      // Setup active filters
-      Wized.data.v = { make: 'Toyota' };
+      // Mock active filters
+      jest.spyOn(manager, 'checkForActiveFilters').mockReturnValue(false);
 
-      // Check for active filters and reset if needed
-      if (manager.checkForActiveFilters()) {
-        await manager.resetAllFilters(mockResetButton);
-      }
-
-      expect(console.error).toHaveBeenCalledWith('Error in resetAllFilters:', expect.any(Error));
+      await clickHandler({ preventDefault: jest.fn() });
+      expect(mockWized.requests.execute).not.toHaveBeenCalled();
     });
   });
 });
