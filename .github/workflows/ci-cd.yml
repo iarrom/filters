@@ -45,9 +45,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Install Dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
-        run: npm ci
+      - name: Clean Install Dependencies
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
+          npm ls husky || true
 
       - name: Run Lint
         run: npm run lint
