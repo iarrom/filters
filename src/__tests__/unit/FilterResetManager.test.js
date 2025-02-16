@@ -1,6 +1,6 @@
 /* global describe, beforeEach, afterEach, test, expect, jest */
 
-import { FilterResetManager } from '../../filters/filter-reset';
+import FilterResetManager from '../../filters/filter-reset';
 import Wized from '../../__mocks__/wized';
 
 describe('FilterResetManager', () => {

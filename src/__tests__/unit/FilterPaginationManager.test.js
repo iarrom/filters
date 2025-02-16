@@ -1,6 +1,6 @@
 /* global describe, beforeEach, afterEach, test, expect, jest */
 
-import { FilterPaginationManager } from '../../filters/filter-pagination';
+import FilterPaginationManager from '../../filters/filter-pagination';
 import Wized from '../../__mocks__/wized';
 
 describe('FilterPaginationManager', () => {

@@ -1,6 +1,6 @@
 /* global describe, beforeEach, afterEach, test, expect, jest, Event */
 
-import { FilterSortManager } from '../../filters/filter-sort';
+import FilterSortManager from '../../filters/filter-sort';
 import Wized from '../../__mocks__/wized';
 
 describe('FilterSortManager', () => {

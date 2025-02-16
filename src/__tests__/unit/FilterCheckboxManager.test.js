@@ -1,6 +1,6 @@
 /* global describe, beforeEach, afterEach, test, expect, jest */
 
-import { FilterCheckboxManager } from '../../filters/filter-checkbox';
+import FilterCheckboxManager from '../../filters/filter-checkbox';
 import Wized from '../../__mocks__/wized';
 
 describe('FilterCheckboxManager', () => {

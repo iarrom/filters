@@ -10,7 +10,7 @@
  * The manager supports multiple filter types (checkbox, radio, select)
  * and provides a clean public API for external integrations.
  */
-export class FilterChipsManager {
+class FilterChipsManager {
   constructor(Wized) {
     this.Wized = Wized;
 
@@ -365,3 +365,5 @@ export class FilterChipsManager {
     window.filterChipsReady = true;
   }
 }
+
+export default FilterChipsManager;
