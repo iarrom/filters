@@ -6,13 +6,20 @@
   "type": "module",
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html --dist-dir dist",
+    "build": "parcel build src/index.html --dist-dir dist --no-source-maps",
+    "build:dev": "parcel build src/index.html --dist-dir dist --no-optimize",
+    "clean": "rm -rf dist .parcel-cache",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{js,json}\"",
     "test": "echo \"No tests specified yet\" && exit 0"
   },
-  "keywords": [],
+  "keywords": [
+    "wized",
+    "filter",
+    "pagination",
+    "webflow"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -20,6 +27,15 @@
     "@babel/core": "^7.26.9",
     "@babel/preset-env": "^7.26.9",
     "@eslint/js": "^8.56.0",
+    "@parcel/compressor-brotli": "^2.13.3",
+    "@parcel/compressor-gzip": "^2.13.3",
+    "@parcel/optimizer-css": "^2.13.3",
+    "@parcel/optimizer-htmlnano": "^2.13.3",
+    "@parcel/optimizer-terser": "^2.13.3",
+    "@parcel/packager-html": "^2.13.3",
+    "@parcel/transformer-css": "^2.13.3",
+    "@parcel/transformer-html": "^2.13.3",
+    "@parcel/transformer-js": "^2.13.3",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
