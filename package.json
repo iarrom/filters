@@ -38,11 +38,14 @@
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --maxWorkers=2",
     "prepare": "husky install",
-    "version:patch": "npm version patch -m 'Release %s' && npm run update-changelog",
-    "version:minor": "npm version minor -m 'Release %s' && npm run update-changelog",
-    "version:major": "npm version major -m 'Release %s' && npm run update-changelog",
+    "version:patch": "npm version patch -m \"Release %s\" && npm run update-changelog",
+    "version:minor": "npm version minor -m \"Release %s\" && npm run update-changelog",
+    "version:major": "npm version major -m \"Release %s\" && npm run update-changelog",
     "update-changelog": "node scripts/update-changelog.js",
-    "release": "npm run build && npm run test && git push --follow-tags && npm publish"
+    "release:patch": "npm run version:patch && git push --follow-tags",
+    "release:minor": "npm run version:minor && git push --follow-tags",
+    "release:major": "npm run version:major && git push --follow-tags",
+    "release": "npm run release:patch"
   },
   "lint-staged": {
     "*.js": [
