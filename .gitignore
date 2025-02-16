@@ -5,3 +5,6 @@ node_modules/
 coverage/
 dist/
 .parcel-cache/
+wized-api-doc.md
+issue-log.md
+problem.md
