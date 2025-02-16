@@ -1,6 +1,6 @@
 /* global describe, beforeEach, afterEach, test, expect, jest */
 
-import { FilterChipsManager } from '../../filters/filter-chips';
+import FilterChipsManager from '../../filters/filter-chips';
 import Wized from '../../__mocks__/wized';
 
 describe('FilterChipsManager', () => {
