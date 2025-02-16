@@ -34,4 +34,12 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
-*.sw? 
+*.sw?
+
+# Documentation and temporary files
+problem.md
+*.temp.md
+*.draft.md
+*.local.md
+TODO.md
+NOTES.md 
