@@ -9,11 +9,14 @@ export default [
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-    },
-    env: {
-      browser: true,
-      node: true,
-      es2021: true,
+      globals: {
+        window: true,
+        document: true,
+        console: true,
+        module: true,
+        require: true,
+        process: true,
+      },
     },
     rules: {
       'no-unused-vars': 'warn',
