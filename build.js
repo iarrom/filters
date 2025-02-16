@@ -1,24 +1,27 @@
-import { minify } from 'terser';
-import fs from 'fs';
-import path from 'path';
+import * as esbuild from 'esbuild';
 
-async function minifyFile() {
+async function build() {
   try {
-    const inputFile = path.resolve('dist/index.js');
-    const outputFile = path.resolve('dist/index.min.js');
-
-    const code = fs.readFileSync(inputFile, 'utf8');
-    const minified = await minify(code, {
-      compress: true,
-      mangle: true,
+    // Bundle and minify
+    const result = await esbuild.build({
+      entryPoints: ['src/index.js'],
+      bundle: true,
+      minify: true,
+      format: 'esm',
+      target: ['es2020'],
+      outfile: 'dist/index.min.js',
+      sourcemap: false,
+      platform: 'browser',
+      define: {
+        'process.env.NODE_ENV': '"production"',
+      },
     });
 
-    fs.writeFileSync(outputFile, minified.code);
-    console.log('Successfully minified the file!');
+    console.log('Build completed successfully!');
   } catch (error) {
-    console.error('Error during minification:', error);
+    console.error('Error during build:', error);
     process.exit(1);
   }
 }
 
-minifyFile();
+build();

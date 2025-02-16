@@ -3,7 +3,7 @@
   "version": "1.0.6",
   "description": "Wized filter and pagination functionality",
   "main": "dist/index.min.js",
-  "module": "dist/index.js",
+  "module": "dist/index.min.js",
   "source": "src/index.js",
   "type": "module",
   "exports": {
@@ -24,7 +24,7 @@
   "author": "Aonnoy Sengupta",
   "scripts": {
     "start": "parcel serve src/filter-main.js --port 3001 --open",
-    "build": "NODE_ENV=production parcel build src/index.js --no-source-maps --no-cache --detailed-report && terser dist/index.js -c -m -o dist/index.min.js",
+    "build": "node build.js",
     "build:dev": "parcel build --no-optimize",
     "clean": "rm -rf dist .parcel-cache",
     "lint": "eslint .",
@@ -73,6 +73,7 @@
     "@parcel/transformer-html": "^2.13.3",
     "@parcel/transformer-js": "^2.13.3",
     "@types/jest": "^29.5.12",
+    "esbuild": "^0.25.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
