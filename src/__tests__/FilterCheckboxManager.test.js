@@ -57,7 +57,7 @@ describe('FilterCheckboxManager', () => {
     checkbox.click();
 
     // Wait for any async operations
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     expect(mockWized.requests.execute).toHaveBeenCalledWith('filterProducts');
     expect(mockWized.data.v.category).toBeDefined();
@@ -76,4 +76,4 @@ describe('FilterCheckboxManager', () => {
       checkbox.querySelector('.w-checkbox-input--inputType-custom.w--redirected-checked')
     ).toBeNull();
   });
-}); 
+});
