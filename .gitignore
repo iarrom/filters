@@ -1,3 +1,5 @@
 .DS_Store
 **/filters(backup)/
 **/.DS_Store
+node_modules/
+coverage/
