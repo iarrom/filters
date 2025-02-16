@@ -4,7 +4,12 @@
   "description": "",
   "main": "filter-checkbox.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "parcel src/index.html",
+    "build": "parcel build src/index.html",
+    "lint": "eslint . --ext .js",
+    "lint:fix": "eslint . --ext .js --fix",
+    "format": "prettier --write \"**/*.{js,json}\"",
+    "test": "echo \"No tests specified yet\" && exit 0"
   },
   "keywords": [],
   "author": "",
