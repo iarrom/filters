@@ -38,8 +38,7 @@ yarn-error.log*
 
 # Documentation and temporary files
 problem.md
+wized-api-doc.md
 *.temp.md
 *.draft.md
 *.local.md
-TODO.md
-NOTES.md 
