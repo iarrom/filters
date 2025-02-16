@@ -29,7 +29,7 @@ export class FilterRadioManager {
   initialize() {
     if (this.state.initialized) return;
     window.uncheckAllRadioButtons = this.uncheckAllRadioButtons;
-    this.Wized.on("requestend", this.handleRequestEnd);
+    this.Wized.on('requestend', this.handleRequestEnd);
     this.state.initialized = true;
   }
 
@@ -38,18 +38,16 @@ export class FilterRadioManager {
   // =============================================
 
   getRadioLabel(radio) {
-    return radio.querySelector("[w-filter-radio-label]")?.textContent || "";
+    return radio.querySelector('[w-filter-radio-label]')?.textContent || '';
   }
 
   updateRadioVisualState(radio, checked) {
-    const customRadio = radio.querySelector(
-      ".w-form-formradioinput--inputType-custom"
-    );
+    const customRadio = radio.querySelector('.w-form-formradioinput--inputType-custom');
     if (customRadio) {
       if (checked) {
-        customRadio.classList.add("w--redirected-checked");
+        customRadio.classList.add('w--redirected-checked');
       } else {
-        customRadio.classList.remove("w--redirected-checked");
+        customRadio.classList.remove('w--redirected-checked');
       }
     }
   }
@@ -65,25 +63,19 @@ export class FilterRadioManager {
     const label = this.getRadioLabel(radio);
     if (!label) return;
 
-    const variableName = radio.getAttribute("w-filter-radio-variable");
-    const paginationVariable = radio.getAttribute(
-      "w-filter-pagination-current-variable"
-    );
-    const filterRequest = radio.getAttribute("w-filter-request");
+    const variableName = radio.getAttribute('w-filter-radio-variable');
+    const paginationVariable = radio.getAttribute('w-filter-pagination-current-variable');
+    const filterRequest = radio.getAttribute('w-filter-request');
 
     const chip = window.filterChips.create({
-      label: `${
-        category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()
-      }: ${label}`,
-      filterType: "radio",
+      label: `${category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}: ${label}`,
+      filterType: 'radio',
       category,
       value: label,
       sourceElement: radio,
       onSourceUpdate: async () => {
         // Find all radios in the same group
-        const group = document.querySelectorAll(
-          `[w-filter-radio-variable="${variableName}"]`
-        );
+        const group = document.querySelectorAll(`[w-filter-radio-variable="${variableName}"]`);
 
         // Uncheck all radios visually
         group.forEach((groupRadio) => {
@@ -120,14 +112,12 @@ export class FilterRadioManager {
   ) {
     // Get selected value
     const selectedValue = forceEmpty
-      ? ""
+      ? ''
       : Array.from(radios).find((radio) =>
-          radio.querySelector(
-            ".w-form-formradioinput--inputType-custom.w--redirected-checked"
-          )
+          radio.querySelector('.w-form-formradioinput--inputType-custom.w--redirected-checked')
         );
 
-    const value = selectedValue ? this.getRadioLabel(selectedValue) : "";
+    const value = selectedValue ? this.getRadioLabel(selectedValue) : '';
 
     // Update Wized variable
     this.Wized.data.v[variableName] = value;
@@ -156,31 +146,23 @@ export class FilterRadioManager {
     if (radios.length === 0) return;
 
     const firstRadio = radios[0];
-    const category = firstRadio.getAttribute("w-filter-radio-category");
-    const filterRequest = firstRadio.getAttribute("w-filter-request");
+    const category = firstRadio.getAttribute('w-filter-radio-category');
+    const filterRequest = firstRadio.getAttribute('w-filter-request');
 
     if (!category || !filterRequest) return;
 
-    const resetButton = document.querySelector(
-      `[w-filter-radio-reset="${category}"]`
-    );
+    const resetButton = document.querySelector(`[w-filter-radio-reset="${category}"]`);
 
     if (!resetButton) return;
 
-    resetButton.addEventListener("click", async (e) => {
+    resetButton.addEventListener('click', async (e) => {
       e.preventDefault();
 
-      const variableName = firstRadio.getAttribute("w-filter-radio-variable");
-      const paginationVariable = firstRadio.getAttribute(
-        "w-filter-pagination-current-variable"
-      );
+      const variableName = firstRadio.getAttribute('w-filter-radio-variable');
+      const paginationVariable = firstRadio.getAttribute('w-filter-pagination-current-variable');
 
       // Clear chips for this category if available
-      if (
-        window.filterChips &&
-        window.filterChipsReady &&
-        window.filterChips.clearCategory
-      ) {
+      if (window.filterChips && window.filterChipsReady && window.filterChips.clearCategory) {
         window.filterChips.clearCategory(category);
       }
 
@@ -189,13 +171,7 @@ export class FilterRadioManager {
         this.updateRadioVisualState(radio, false);
       });
 
-      await this.updateWizedVariable(
-        radios,
-        variableName,
-        paginationVariable,
-        filterRequest,
-        true
-      );
+      await this.updateWizedVariable(radios, variableName, paginationVariable, filterRequest, true);
     });
   }
 
@@ -204,22 +180,18 @@ export class FilterRadioManager {
   // =============================================
 
   setupFilterMonitoring() {
-    const filterWrapper = document.querySelector("[w-filter-wrapper]");
+    const filterWrapper = document.querySelector('[w-filter-wrapper]');
     if (!filterWrapper) return null;
 
-    const radios = filterWrapper.querySelectorAll(
-      "label[wized][w-filter-radio-variable]"
-    );
+    const radios = filterWrapper.querySelectorAll('label[wized][w-filter-radio-variable]');
 
     if (radios.length > 0) {
       return Array.from(radios).reduce((groups, radio) => {
-        const wizedValue = radio.getAttribute("wized");
-        const variableName = radio.getAttribute("w-filter-radio-variable");
-        const paginationVariable = radio.getAttribute(
-          "w-filter-pagination-current-variable"
-        );
-        const filterRequest = radio.getAttribute("w-filter-request");
-        const requestName = radio.getAttribute("w-filter-radio-request");
+        const wizedValue = radio.getAttribute('wized');
+        const variableName = radio.getAttribute('w-filter-radio-variable');
+        const paginationVariable = radio.getAttribute('w-filter-pagination-current-variable');
+        const filterRequest = radio.getAttribute('w-filter-request');
+        const requestName = radio.getAttribute('w-filter-radio-request');
 
         if (!groups[wizedValue]) {
           groups[wizedValue] = {
@@ -243,26 +215,16 @@ export class FilterRadioManager {
   // EVENT HANDLING
   // =============================================
 
-  handleRadioClick(
-    radio,
-    elements,
-    variableName,
-    paginationVariable,
-    filterRequest
-  ) {
+  handleRadioClick(radio, elements, variableName, paginationVariable, filterRequest) {
     // Prevent multiple simultaneous clicks
     if (this.state.processingClick) return;
     this.state.processingClick = true;
 
-    const category = radio.getAttribute("w-filter-radio-category");
+    const category = radio.getAttribute('w-filter-radio-category');
 
     try {
       // Clear existing chips if available
-      if (
-        window.filterChips &&
-        window.filterChipsReady &&
-        window.filterChips.clearCategory
-      ) {
+      if (window.filterChips && window.filterChipsReady && window.filterChips.clearCategory) {
         window.filterChips.clearCategory(category);
       }
 
@@ -275,14 +237,9 @@ export class FilterRadioManager {
       this.createRadioChip(radio, category);
 
       // Update Wized variable
-      this.updateWizedVariable(
-        elements,
-        variableName,
-        paginationVariable,
-        filterRequest
-      );
+      this.updateWizedVariable(elements, variableName, paginationVariable, filterRequest);
     } catch (error) {
-      console.error("Error handling radio click:", error);
+      console.error('Error handling radio click:', error);
     } finally {
       this.state.processingClick = false;
     }
@@ -305,47 +262,35 @@ export class FilterRadioManager {
       this.state.monitoredGroups.add(groupKey);
 
       // Initialize Wized variable if needed
-      if (typeof this.Wized.data.v[variableName] === "undefined") {
-        this.Wized.data.v[variableName] = "";
+      if (typeof this.Wized.data.v[variableName] === 'undefined') {
+        this.Wized.data.v[variableName] = '';
       }
 
       this.setupResetButton(group);
 
       // Add click handlers to radios
       elements.forEach((radio) => {
-        radio.addEventListener("click", (e) => {
+        radio.addEventListener('click', (e) => {
           e.preventDefault(); // Prevent default to handle state manually
-          this.handleRadioClick(
-            radio,
-            elements,
-            variableName,
-            paginationVariable,
-            filterRequest
-          );
+          this.handleRadioClick(radio, elements, variableName, paginationVariable, filterRequest);
         });
       });
 
       // Monitor dynamic filter requests
       if (!isStatic && requestName) {
-        this.Wized.on("requestend", (filterResult) => {
-          if (
-            filterResult.id === requestName ||
-            filterResult.name === requestName
-          ) {
-            // Dynamic filter request completed
+        this.Wized.on('requestend', (filterResult) => {
+          if (filterResult.id === requestName || filterResult.name === requestName) {
+            this.updateRadioStates();
           }
         });
       }
     }
   }
 
-  handleRequestEnd(result) {
-    const radioGroups = this.setupFilterMonitoring();
-
-    if (radioGroups) {
-      Object.values(radioGroups).forEach((group) => {
-        this.setupGroupEventHandlers(group);
-      });
+  handleRequestEnd(filterResult) {
+    const requestName = this.requestName;
+    if (filterResult.id === requestName || filterResult.name === requestName) {
+      this.updateRadioStates();
     }
   }
 
@@ -354,26 +299,20 @@ export class FilterRadioManager {
   // =============================================
 
   async uncheckAllRadioButtons() {
-    const filterWrapper = document.querySelector("[w-filter-wrapper]");
+    const filterWrapper = document.querySelector('[w-filter-wrapper]');
     if (!filterWrapper) return;
 
-    const radios = filterWrapper.querySelectorAll(
-      "label[wized][w-filter-radio-variable]"
-    );
+    const radios = filterWrapper.querySelectorAll('label[wized][w-filter-radio-variable]');
 
     if (radios.length === 0) return;
 
     // Clear all radio chips if available
-    if (
-      window.filterChips &&
-      window.filterChipsReady &&
-      window.filterChips.clearAll
-    ) {
+    if (window.filterChips && window.filterChipsReady && window.filterChips.clearAll) {
       window.filterChips.clearAll();
     }
 
     const groupedByVariable = Array.from(radios).reduce((groups, radio) => {
-      const variableName = radio.getAttribute("w-filter-radio-variable");
+      const variableName = radio.getAttribute('w-filter-radio-variable');
       if (!groups[variableName]) {
         groups[variableName] = [];
       }
@@ -381,16 +320,14 @@ export class FilterRadioManager {
       return groups;
     }, {});
 
-    for (const [variableName, radioGroup] of Object.entries(
-      groupedByVariable
-    )) {
+    for (const [variableName, radioGroup] of Object.entries(groupedByVariable)) {
       // Reset UI state
       radioGroup.forEach((radio) => {
         this.updateRadioVisualState(radio, false);
       });
 
       // Reset Wized variable
-      this.Wized.data.v[variableName] = "";
+      this.Wized.data.v[variableName] = '';
     }
   }
 }

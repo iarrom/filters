@@ -39,7 +39,7 @@ export class FilterSelectRangeManager {
     window.resetAllRangeSelects = this.resetAllRangeSelects;
 
     // Set up request monitoring
-    this.Wized.on("requestend", this.handleRequestEnd);
+    this.Wized.on('requestend', this.handleRequestEnd);
 
     this.state.initialized = true;
     // console.log("Initialized range select filter monitoring");
@@ -50,7 +50,7 @@ export class FilterSelectRangeManager {
   // =============================================
 
   getSelectedValue(select) {
-    return select.value || "";
+    return select.value || '';
   }
 
   createRangeIdentifier(category) {
@@ -58,7 +58,7 @@ export class FilterSelectRangeManager {
   }
 
   findOptionsWrapper(select, isFromSelect) {
-    const category = select.getAttribute("w-filter-select-range-category");
+    const category = select.getAttribute('w-filter-select-range-category');
     if (!category) return null;
 
     const wrapperSelector = isFromSelect
@@ -90,21 +90,17 @@ export class FilterSelectRangeManager {
   // =============================================
 
   extractOptionsFromWrapper(wrapper, isFromSelect) {
-    const optionType = isFromSelect ? "from" : "to";
+    const optionType = isFromSelect ? 'from' : 'to';
     const optionTexts = Array.from(
-      wrapper.querySelectorAll(
-        `[w-filter-select-range-${optionType}-option="option-text"]`
-      )
+      wrapper.querySelectorAll(`[w-filter-select-range-${optionType}-option="option-text"]`)
     );
     const optionValues = Array.from(
-      wrapper.querySelectorAll(
-        `[w-filter-select-range-${optionType}-value="value-text"]`
-      )
+      wrapper.querySelectorAll(`[w-filter-select-range-${optionType}-value="value-text"]`)
     );
 
     return optionTexts
       .map((textEl, index) => {
-        const text = textEl.textContent?.trim() || "";
+        const text = textEl.textContent?.trim() || '';
         const value = optionValues[index]?.textContent?.trim() || text;
         return { text, value };
       })
@@ -117,27 +113,22 @@ export class FilterSelectRangeManager {
     const currentValue = select.value;
     const placeholder = select.options[0]?.cloneNode(true);
     const options = this.extractOptionsFromWrapper(wrapper, isFromSelect);
-    const sortedOptions = options.sort(
-      (a, b) => parseFloat(a.value) - parseFloat(b.value)
-    );
+    const sortedOptions = options.sort((a, b) => parseFloat(a.value) - parseFloat(b.value));
 
     // Create a new select element to build options
-    const tempSelect = document.createElement("select");
+    const tempSelect = document.createElement('select');
     if (placeholder) tempSelect.add(placeholder);
 
     // Add all options to temp select
     sortedOptions.forEach(({ text, value }) => {
-      const option = document.createElement("option");
+      const option = document.createElement('option');
       option.text = text;
       option.value = value;
       tempSelect.add(option);
     });
 
     // If current value exists in new options, pre-select it in temp select
-    if (
-      currentValue &&
-      Array.from(tempSelect.options).some((opt) => opt.value === currentValue)
-    ) {
+    if (currentValue && Array.from(tempSelect.options).some((opt) => opt.value === currentValue)) {
       tempSelect.value = currentValue;
     }
 
@@ -162,11 +153,11 @@ export class FilterSelectRangeManager {
   // =============================================
 
   getSelectedText(select) {
-    return select.options[select.selectedIndex]?.text || "";
+    return select.options[select.selectedIndex]?.text || '';
   }
 
   createRangeChipId(category, isFromSelect) {
-    return `${category}-${isFromSelect ? "from" : "to"}`;
+    return `${category}-${isFromSelect ? 'from' : 'to'}`;
   }
 
   createRangeChip(select, category, isFromSelect) {
@@ -179,7 +170,7 @@ export class FilterSelectRangeManager {
 
     const chipLabel = `${
       category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()
-    } ${isFromSelect ? "FROM" : "TO"}: ${text}`;
+    } ${isFromSelect ? 'FROM' : 'TO'}: ${text}`;
     const chipValue = value;
     const chipId = this.createRangeChipId(category, isFromSelect);
 
@@ -187,10 +178,7 @@ export class FilterSelectRangeManager {
     const currentValue = select.value;
 
     // Remove existing chip for this type if it exists
-    if (
-      window.filterChips.exists &&
-      window.filterChips.exists(chipId, chipValue)
-    ) {
+    if (window.filterChips.exists && window.filterChips.exists(chipId, chipValue)) {
       if (window.filterChips.removeByValue) {
         window.filterChips.removeByValue(chipId, chipValue);
       }
@@ -198,17 +186,15 @@ export class FilterSelectRangeManager {
 
     const chip = window.filterChips.create({
       label: chipLabel,
-      filterType: "select",
+      filterType: 'select',
       category: chipId, // Use unique category for FROM/TO
       value: chipValue,
       sourceElement: select,
       onSourceUpdate: () => {
         // Only reset if the current value is different from when the chip was created
         if (select.value === currentValue) {
-          select.value = "";
-          Array.from(select.options).forEach(
-            (option) => (option.disabled = false)
-          );
+          select.value = '';
+          Array.from(select.options).forEach((option) => (option.disabled = false));
         }
       },
     });
@@ -229,20 +215,16 @@ export class FilterSelectRangeManager {
     forceEmpty = false,
     isReset = false
   ) {
-    const fromValue = forceEmpty ? "" : this.getSelectedValue(fromSelect);
-    const toValue = forceEmpty ? "" : this.getSelectedValue(toSelect);
-    const category = fromSelect.getAttribute("w-filter-select-range-category");
+    const fromValue = forceEmpty ? '' : this.getSelectedValue(fromSelect);
+    const toValue = forceEmpty ? '' : this.getSelectedValue(toSelect);
+    const category = fromSelect.getAttribute('w-filter-select-range-category');
 
     if (window.filterChips && window.filterChipsReady) {
       if (isReset) {
         // Only clear chips on reset if available
         if (window.filterChips.clearCategory) {
-          window.filterChips.clearCategory(
-            this.createRangeChipId(category, true)
-          );
-          window.filterChips.clearCategory(
-            this.createRangeChipId(category, false)
-          );
+          window.filterChips.clearCategory(this.createRangeChipId(category, true));
+          window.filterChips.clearCategory(this.createRangeChipId(category, false));
         }
       } else if (!forceEmpty) {
         // Update chips based on which select changed
@@ -259,12 +241,7 @@ export class FilterSelectRangeManager {
     this.Wized.data.v[fromVariable] = fromValue;
     this.Wized.data.v[toVariable] = toValue;
 
-    if (
-      isReset ||
-      fromValue ||
-      toValue ||
-      (!forceEmpty && (!fromValue || !toValue))
-    ) {
+    if (isReset || fromValue || toValue || (!forceEmpty && (!fromValue || !toValue))) {
       if (paginationVariable) {
         this.Wized.data.v[paginationVariable] = 1;
       }
@@ -292,25 +269,19 @@ export class FilterSelectRangeManager {
     paginationVariable,
     filterRequest
   ) {
-    const resetButton = document.querySelector(
-      `[w-filter-select-range-reset="${category}"]`
-    );
+    const resetButton = document.querySelector(`[w-filter-select-range-reset="${category}"]`);
     if (!resetButton) return;
 
-    resetButton.addEventListener("click", async (e) => {
+    resetButton.addEventListener('click', async (e) => {
       e.preventDefault();
 
-      const hadSelection = fromSelect.value !== "" || toSelect.value !== "";
+      const hadSelection = fromSelect.value !== '' || toSelect.value !== '';
 
-      fromSelect.value = "";
-      toSelect.value = "";
+      fromSelect.value = '';
+      toSelect.value = '';
 
-      Array.from(fromSelect.options).forEach(
-        (option) => (option.disabled = false)
-      );
-      Array.from(toSelect.options).forEach(
-        (option) => (option.disabled = false)
-      );
+      Array.from(fromSelect.options).forEach((option) => (option.disabled = false));
+      Array.from(toSelect.options).forEach((option) => (option.disabled = false));
 
       await this.updateWizedVariables(
         fromSelect,
@@ -345,7 +316,7 @@ export class FilterSelectRangeManager {
     this.updateSelectOptions(fromSelect, fromWrapper, true, toSelect);
     this.updateSelectOptions(toSelect, toWrapper, false, fromSelect);
 
-    this.Wized.on("requestend", (result) => {
+    this.Wized.on('requestend', (result) => {
       if (result.id === requestName || result.name === requestName) {
         this.updateSelectOptions(fromSelect, fromWrapper, true, toSelect);
         this.updateSelectOptions(toSelect, toWrapper, false, fromSelect);
@@ -354,8 +325,7 @@ export class FilterSelectRangeManager {
         const currentToValue = toSelect.value;
 
         if (
-          (currentFromValue &&
-            currentFromValue !== this.Wized.data.v[fromVariable]) ||
+          (currentFromValue && currentFromValue !== this.Wized.data.v[fromVariable]) ||
           (currentToValue && currentToValue !== this.Wized.data.v[toVariable])
         ) {
           this.updateWizedVariables(
@@ -376,27 +346,19 @@ export class FilterSelectRangeManager {
   // =============================================
 
   setupRangeGroup(fromSelect, toSelect) {
-    const category = fromSelect.getAttribute("w-filter-select-range-category");
-    const fromVariable = fromSelect.getAttribute(
-      "w-filter-select-range-from-variable"
-    );
-    const toVariable = toSelect.getAttribute(
-      "w-filter-select-range-to-variable"
-    );
-    const paginationVariable = fromSelect.getAttribute(
-      "w-filter-pagination-current-variable"
-    );
-    const filterRequest = fromSelect.getAttribute("w-filter-request");
-    const requestName = fromSelect.getAttribute(
-      "w-filter-select-range-request"
-    );
+    const category = fromSelect.getAttribute('w-filter-select-range-category');
+    const fromVariable = fromSelect.getAttribute('w-filter-select-range-from-variable');
+    const toVariable = toSelect.getAttribute('w-filter-select-range-to-variable');
+    const paginationVariable = fromSelect.getAttribute('w-filter-pagination-current-variable');
+    const filterRequest = fromSelect.getAttribute('w-filter-request');
+    const requestName = fromSelect.getAttribute('w-filter-select-range-request');
 
     // Initialize Wized variables if needed
-    if (typeof this.Wized.data.v[fromVariable] === "undefined") {
-      this.Wized.data.v[fromVariable] = "";
+    if (typeof this.Wized.data.v[fromVariable] === 'undefined') {
+      this.Wized.data.v[fromVariable] = '';
     }
-    if (typeof this.Wized.data.v[toVariable] === "undefined") {
-      this.Wized.data.v[toVariable] = "";
+    if (typeof this.Wized.data.v[toVariable] === 'undefined') {
+      this.Wized.data.v[toVariable] = '';
     }
 
     this.setupResetButton(
@@ -410,7 +372,7 @@ export class FilterSelectRangeManager {
     );
 
     // Add change handlers
-    fromSelect.addEventListener("change", async () => {
+    fromSelect.addEventListener('change', async () => {
       if (this.state.processingChange) return;
       this.state.processingChange = true;
 
@@ -427,7 +389,7 @@ export class FilterSelectRangeManager {
       this.state.processingChange = false;
     });
 
-    toSelect.addEventListener("change", async () => {
+    toSelect.addEventListener('change', async () => {
       if (this.state.processingChange) return;
       this.state.processingChange = true;
 
@@ -465,18 +427,16 @@ export class FilterSelectRangeManager {
   // =============================================
 
   setupFilterMonitoring() {
-    const filterWrapper = document.querySelector("[w-filter-wrapper]");
+    const filterWrapper = document.querySelector('[w-filter-wrapper]');
     if (!filterWrapper) return;
 
     const fromSelects = filterWrapper.querySelectorAll(
-      "select[w-filter-select-range-from-variable]"
+      'select[w-filter-select-range-from-variable]'
     );
     if (fromSelects.length === 0) return;
 
     fromSelects.forEach((fromSelect) => {
-      const category = fromSelect.getAttribute(
-        "w-filter-select-range-category"
-      );
+      const category = fromSelect.getAttribute('w-filter-select-range-category');
       if (!category) return;
 
       const identifier = this.createRangeIdentifier(category);
@@ -505,11 +465,11 @@ export class FilterSelectRangeManager {
   // =============================================
 
   async resetAllRangeSelects() {
-    const filterWrapper = document.querySelector("[w-filter-wrapper]");
+    const filterWrapper = document.querySelector('[w-filter-wrapper]');
     if (!filterWrapper) return;
 
     const rangeSelects = filterWrapper.querySelectorAll(
-      "select[w-filter-select-range-from-variable], select[w-filter-select-range-to-variable]"
+      'select[w-filter-select-range-from-variable], select[w-filter-select-range-to-variable]'
     );
     if (rangeSelects.length === 0) return;
 
@@ -517,34 +477,26 @@ export class FilterSelectRangeManager {
     if (window.filterChips && window.filterChipsReady) {
       const processedCategories = new Set();
       rangeSelects.forEach((select) => {
-        const category = select.getAttribute("w-filter-select-range-category");
+        const category = select.getAttribute('w-filter-select-range-category');
         if (category && !processedCategories.has(category)) {
           processedCategories.add(category);
           // Clear both FROM and TO chips for this category if clearCategory is available
           if (window.filterChips.clearCategory) {
-            window.filterChips.clearCategory(
-              this.createRangeChipId(category, true)
-            );
-            window.filterChips.clearCategory(
-              this.createRangeChipId(category, false)
-            );
+            window.filterChips.clearCategory(this.createRangeChipId(category, true));
+            window.filterChips.clearCategory(this.createRangeChipId(category, false));
           }
         }
       });
     }
 
     rangeSelects.forEach((select) => {
-      select.value = "";
+      select.value = '';
       Array.from(select.options).forEach((option) => (option.disabled = false));
 
-      const fromVariable = select.getAttribute(
-        "w-filter-select-range-from-variable"
-      );
-      const toVariable = select.getAttribute(
-        "w-filter-select-range-to-variable"
-      );
-      if (fromVariable) this.Wized.data.v[fromVariable] = "";
-      if (toVariable) this.Wized.data.v[toVariable] = "";
+      const fromVariable = select.getAttribute('w-filter-select-range-from-variable');
+      const toVariable = select.getAttribute('w-filter-select-range-to-variable');
+      if (fromVariable) this.Wized.data.v[fromVariable] = '';
+      if (toVariable) this.Wized.data.v[toVariable] = '';
     });
   }
 }

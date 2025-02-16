@@ -16,11 +16,24 @@ export default [
         module: true,
         require: true,
         process: true,
+        setTimeout: true,
+        IntersectionObserver: true,
       },
     },
     rules: {
       'no-unused-vars': 'warn',
-      'no-console': 'warn',
+      'no-console': 'off',
+      'no-undef': 'error',
+      'prettier/prettier': [
+        'error',
+        {
+          singleQuote: true,
+          trailingComma: 'es5',
+          printWidth: 100,
+          semi: true,
+          bracketSpacing: true,
+        },
+      ],
     },
   },
 ];

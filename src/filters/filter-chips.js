@@ -21,7 +21,7 @@ export class FilterChipsManager {
       chipRelationships: new Map(),
       activeChips: new Set(),
       // Filter types that allow only one selection per category
-      singleSelectionCategories: new Set(["radio", "select"]),
+      singleSelectionCategories: new Set(['radio', 'select']),
       // Track chips by their source type
       chipsByType: new Map(),
     };
@@ -43,9 +43,9 @@ export class FilterChipsManager {
     this.setupContainer();
 
     // Initialize chip type tracking
-    this.state.chipsByType.set("checkbox", new Set());
-    this.state.chipsByType.set("radio", new Set());
-    this.state.chipsByType.set("select", new Set());
+    this.state.chipsByType.set('checkbox', new Set());
+    this.state.chipsByType.set('radio', new Set());
+    this.state.chipsByType.set('select', new Set());
 
     // Make public API available globally
     this.exposePublicAPI();
@@ -64,7 +64,7 @@ export class FilterChipsManager {
     }
 
     // Hide the template element
-    template.style.display = "none";
+    template.style.display = 'none';
 
     this.state.chipTemplate = template;
     return template;
@@ -98,7 +98,7 @@ export class FilterChipsManager {
    */
   createChipRelationship(chipId, sourceElement, onSourceUpdate) {
     if (!chipId || !sourceElement) {
-      console.error("Invalid chip relationship parameters");
+      console.error('Invalid chip relationship parameters');
       return;
     }
 
@@ -113,15 +113,15 @@ export class FilterChipsManager {
    */
   handleChipRemoval(chip) {
     if (!chip) {
-      console.error("Invalid chip element provided for removal");
+      console.error('Invalid chip element provided for removal');
       return;
     }
 
-    const chipId = chip.getAttribute("data-chip-id");
-    const filterType = chip.getAttribute("data-filter-type");
+    const chipId = chip.getAttribute('data-chip-id');
+    const filterType = chip.getAttribute('data-filter-type');
 
     if (!chipId) {
-      console.error("Chip missing required data-chip-id attribute");
+      console.error('Chip missing required data-chip-id attribute');
       return;
     }
 
@@ -143,7 +143,7 @@ export class FilterChipsManager {
         // Execute the source update callback after chip is removed
         relationship.onSourceUpdate();
       } catch (error) {
-        console.error("Error updating source element:", error);
+        console.error('Error updating source element:', error);
       } finally {
         // Clean up the relationship
         this.state.chipRelationships.delete(chipId);
@@ -176,18 +176,11 @@ export class FilterChipsManager {
   /**
    * Creates a new filter chip
    */
-  createFilterChip({
-    label,
-    filterType,
-    category,
-    value,
-    sourceElement,
-    onSourceUpdate,
-  }) {
+  createFilterChip({ label, filterType, category, value, sourceElement, onSourceUpdate }) {
     try {
       // Validate required parameters
       if (!label || !category || !value) {
-        console.error("Missing required parameters for chip creation");
+        console.error('Missing required parameters for chip creation');
         return null;
       }
 
@@ -216,32 +209,32 @@ export class FilterChipsManager {
       const chipId = `${category}-${value}`;
 
       // Set data attributes
-      chip.setAttribute("data-filter-type", filterType || "default");
-      chip.setAttribute("data-filter-category", category);
-      chip.setAttribute("data-filter-value", value);
-      chip.setAttribute("data-chip-id", chipId);
+      chip.setAttribute('data-filter-type', filterType || 'default');
+      chip.setAttribute('data-filter-category', category);
+      chip.setAttribute('data-filter-value', value);
+      chip.setAttribute('data-chip-id', chipId);
 
       // Ensure chip is visible
-      chip.style.display = "";
+      chip.style.display = '';
 
       // Set the label text
       const labelElement = chip.querySelector('[w-filter-chip="label"]');
       if (labelElement) {
         labelElement.textContent = label;
       } else {
-        console.warn("Label element not found in chip template");
+        console.warn('Label element not found in chip template');
       }
 
       // Add remove button handler
       const removeButton = chip.querySelector('[w-filter-chip="remove"]');
       if (removeButton) {
-        removeButton.addEventListener("click", (e) => {
+        removeButton.addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
           this.handleChipRemoval(chip);
         });
       } else {
-        console.warn("Remove button not found in chip template");
+        console.warn('Remove button not found in chip template');
       }
 
       // Create relationship if source element is provided
@@ -262,7 +255,7 @@ export class FilterChipsManager {
 
       return chip;
     } catch (error) {
-      console.error("Error creating filter chip:", error);
+      console.error('Error creating filter chip:', error);
       return null;
     }
   }
@@ -310,9 +303,7 @@ export class FilterChipsManager {
     const container = this.state.chipContainer;
     if (!container) return;
 
-    const chips = Array.from(
-      container.querySelectorAll(`[data-filter-category="${category}"]`)
-    );
+    const chips = Array.from(container.querySelectorAll(`[data-filter-category="${category}"]`));
 
     chips.forEach((chip) => {
       if (chip !== this.state.chipTemplate) {
@@ -343,9 +334,7 @@ export class FilterChipsManager {
     const container = this.state.chipContainer;
     if (!container) return;
 
-    const chips = Array.from(
-      container.querySelectorAll('[w-filter-chip="chip"]')
-    );
+    const chips = Array.from(container.querySelectorAll('[w-filter-chip="chip"]'));
 
     chips.forEach((chip) => {
       if (chip !== this.state.chipTemplate) {

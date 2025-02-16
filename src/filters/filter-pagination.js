@@ -40,7 +40,7 @@ export class FilterPaginationManager {
     // console.log("FilterPaginationManager: Running initialize");
 
     // Set up request monitoring using the correct event system
-    this.Wized.on("requestend", this.handleRequestEnd);
+    this.Wized.on('requestend', this.handleRequestEnd);
 
     // Initial setup
     this.setupFilterMonitoring();
@@ -58,18 +58,12 @@ export class FilterPaginationManager {
    */
   async setupTrigger(trigger) {
     // Get all required attributes
-    const initialRequestName = trigger.getAttribute(
-      "w-filter-pagination-request"
-    ); // Initial request to wait for
-    const paginationRequestName = trigger.getAttribute("w-filter-request"); // Request to execute on intersection
-    const resultDataPath = trigger.getAttribute("w-filter-result-data-path");
-    const resultVariableName = trigger.getAttribute("w-filter-result-variable");
-    const nextVariableName = trigger.getAttribute(
-      "w-filter-pagination-next-variable"
-    );
-    const currentVariableName = trigger.getAttribute(
-      "w-filter-pagination-current-variable"
-    );
+    const initialRequestName = trigger.getAttribute('w-filter-pagination-request'); // Initial request to wait for
+    const paginationRequestName = trigger.getAttribute('w-filter-request'); // Request to execute on intersection
+    const resultDataPath = trigger.getAttribute('w-filter-result-data-path');
+    const resultVariableName = trigger.getAttribute('w-filter-result-variable');
+    const nextVariableName = trigger.getAttribute('w-filter-pagination-next-variable');
+    const currentVariableName = trigger.getAttribute('w-filter-pagination-current-variable');
 
     // console.log("FilterPaginationManager: Setting up trigger", {
     //   initialRequestName,
@@ -137,10 +131,7 @@ export class FilterPaginationManager {
               currentVariableName,
             });
           } catch (error) {
-            console.error(
-              "FilterPaginationManager: Error in pagination process:",
-              error
-            );
+            console.error('FilterPaginationManager: Error in pagination process:', error);
           } finally {
             this.state.processingRequest = false;
           }
@@ -231,7 +222,7 @@ export class FilterPaginationManager {
    * @returns {any} The data at the specified path
    */
   getDataFromPath(path) {
-    const pathParts = path.split(".");
+    const pathParts = path.split('.');
     let data = this.Wized.data;
     for (const part of pathParts) {
       data = data[part];
@@ -281,7 +272,7 @@ export class FilterPaginationManager {
     }
 
     // Monitor for future request completions
-    this.Wized.on("requestend", (result) => {
+    this.Wized.on('requestend', (result) => {
       //   console.log(
       //     "FilterPaginationManager: Received requestend event:",
       //     result
@@ -306,16 +297,14 @@ export class FilterPaginationManager {
     // console.log("FilterPaginationManager: Setting up filter monitoring");
 
     // Find the wrapper element
-    const filterWrapper = document.querySelector("[w-filter-wrapper]");
+    const filterWrapper = document.querySelector('[w-filter-wrapper]');
     if (!filterWrapper) {
       //   console.log("FilterPaginationManager: No filter wrapper found");
       return;
     }
 
     // Find pagination triggers inside the wrapper
-    const paginationTriggers = filterWrapper.querySelectorAll(
-      "[w-filter-pagination-trigger]"
-    );
+    const paginationTriggers = filterWrapper.querySelectorAll('[w-filter-pagination-trigger]');
 
     // console.log(
     //   "FilterPaginationManager: Found pagination triggers inside wrapper:",

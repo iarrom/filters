@@ -41,7 +41,7 @@ export class FilterSortManager {
     window.resetAllSortInputs = this.resetAllSortInputs;
 
     // Set up request monitoring
-    this.Wized.on("requestend", this.handleRequestEnd);
+    this.Wized.on('requestend', this.handleRequestEnd);
 
     this.state.initialized = true;
     // console.log("FilterSortManager: Initialization complete");
@@ -52,7 +52,7 @@ export class FilterSortManager {
   // =============================================
 
   findOptionsWrapper(select) {
-    const category = select.getAttribute("w-filter-sort-category");
+    const category = select.getAttribute('w-filter-sort-category');
     // console.log("FilterSortManager: Looking for wrapper with category:", category);
 
     if (!category) {
@@ -69,16 +69,14 @@ export class FilterSortManager {
   }
 
   extractOptionsFromWrapper(wrapper) {
-    const optionElements = wrapper.querySelectorAll(
-      '[w-filter-sort-option="option-text"]'
-    );
+    const optionElements = wrapper.querySelectorAll('[w-filter-sort-option="option-text"]');
     // console.log("FilterSortManager: Found option elements:", optionElements.length);
 
     const options = Array.from(optionElements).map((optionEl) => {
       const option = {
-        text: optionEl.textContent || "",
-        orderBy: optionEl.getAttribute("w-filter-sort-orderby") || "",
-        sortBy: optionEl.getAttribute("w-filter-sort-sortby") || "",
+        text: optionEl.textContent || '',
+        orderBy: optionEl.getAttribute('w-filter-sort-orderby') || '',
+        sortBy: optionEl.getAttribute('w-filter-sort-sortby') || '',
       };
       // console.log("FilterSortManager: Extracted option:", option);
       return option;
@@ -95,7 +93,7 @@ export class FilterSortManager {
     // console.log("FilterSortManager: Placeholder:", placeholder?.text);
 
     // Clear all options
-    select.innerHTML = "";
+    select.innerHTML = '';
 
     // Restore placeholder
     if (placeholder) {
@@ -109,7 +107,7 @@ export class FilterSortManager {
 
     // Add new options
     options.forEach(({ text, orderBy, sortBy }) => {
-      const option = document.createElement("option");
+      const option = document.createElement('option');
       option.text = text;
       option.value = JSON.stringify({ orderBy, sortBy });
       select.add(option);
@@ -117,10 +115,7 @@ export class FilterSortManager {
     });
 
     // Restore previous value if it still exists
-    if (
-      currentValue &&
-      Array.from(select.options).some((opt) => opt.value === currentValue)
-    ) {
+    if (currentValue && Array.from(select.options).some((opt) => opt.value === currentValue)) {
       select.value = currentValue;
       // console.log("FilterSortManager: Restored previous value:", currentValue);
     }
@@ -130,12 +125,7 @@ export class FilterSortManager {
   // STATE MANAGEMENT AND WIZED INTEGRATION
   // =============================================
 
-  async updateWizedVariable(
-    select,
-    variableName,
-    paginationVariable,
-    filterRequest
-  ) {
+  async updateWizedVariable(select, variableName, paginationVariable, filterRequest) {
     // console.log("FilterSortManager: Updating Wized variable...");
     let value = [];
 
@@ -144,17 +134,17 @@ export class FilterSortManager {
         const selectedOption = JSON.parse(select.value);
         value = [
           {
-            orderBy: selectedOption.orderBy || "",
-            sortBy: selectedOption.sortBy || "",
+            orderBy: selectedOption.orderBy || '',
+            sortBy: selectedOption.sortBy || '',
           },
         ];
         // console.log("FilterSortManager: Parsed selected option:", value);
       } catch (error) {
         // console.error("FilterSortManager: Error parsing sort option:", error);
-        value = [{ orderBy: "", sortBy: "" }];
+        value = [{ orderBy: '', sortBy: '' }];
       }
     } else {
-      value = [{ orderBy: "", sortBy: "" }];
+      value = [{ orderBy: '', sortBy: '' }];
     }
 
     // Update Wized variable
@@ -183,15 +173,13 @@ export class FilterSortManager {
   // =============================================
 
   setupDynamicSort(select) {
-    const requestName = select.getAttribute("w-filter-sort-request");
+    const requestName = select.getAttribute('w-filter-sort-request');
     if (!requestName) return;
 
-    const category = select.getAttribute("w-filter-sort-category");
-    const variableName = select.getAttribute("w-filter-sort-variable");
-    const paginationVariable = select.getAttribute(
-      "w-filter-pagination-current-variable"
-    );
-    const filterRequest = select.getAttribute("w-filter-request");
+    const category = select.getAttribute('w-filter-sort-category');
+    const variableName = select.getAttribute('w-filter-sort-variable');
+    const paginationVariable = select.getAttribute('w-filter-pagination-current-variable');
+    const filterRequest = select.getAttribute('w-filter-request');
 
     // Find the options wrapper
     const wrapper = document.querySelector(
@@ -203,7 +191,7 @@ export class FilterSortManager {
     this.state.dynamicSorts.set(select, { wrapper, requestName });
 
     // Monitor for option updates
-    this.Wized.on("requestend", (result) => {
+    this.Wized.on('requestend', (result) => {
       if (result.id === requestName || result.name === requestName) {
         // console.log("Dynamic sort: Updating options for request:", requestName);
 
@@ -213,12 +201,7 @@ export class FilterSortManager {
         // Check if we need to update the Wized variable
         const currentValue = select.value;
         if (currentValue && currentValue !== this.Wized.data.v[variableName]) {
-          this.updateWizedVariable(
-            select,
-            variableName,
-            paginationVariable,
-            filterRequest
-          );
+          this.updateWizedVariable(select, variableName, paginationVariable, filterRequest);
         }
       }
     });
@@ -226,8 +209,8 @@ export class FilterSortManager {
 
   setupSelect(select) {
     // console.log("FilterSortManager: Setting up sort select...");
-    const variableName = select.getAttribute("w-filter-sort-variable");
-    const category = select.getAttribute("w-filter-sort-category");
+    const variableName = select.getAttribute('w-filter-sort-variable');
+    const category = select.getAttribute('w-filter-sort-category');
     const identifier = `${category}-${variableName}`;
 
     // console.log("FilterSortManager: Select details:", { variableName, category, identifier });
@@ -239,11 +222,9 @@ export class FilterSortManager {
 
     this.state.monitoredSorts.add(identifier);
 
-    const paginationVariable = select.getAttribute(
-      "w-filter-pagination-current-variable"
-    );
-    const filterRequest = select.getAttribute("w-filter-request");
-    const requestName = select.getAttribute("w-filter-sort-request");
+    const paginationVariable = select.getAttribute('w-filter-pagination-current-variable');
+    const filterRequest = select.getAttribute('w-filter-request');
+    const requestName = select.getAttribute('w-filter-sort-request');
     const isDynamic = !!requestName;
 
     // Find the options wrapper with matching category
@@ -258,16 +239,14 @@ export class FilterSortManager {
     }
 
     // Get all option elements
-    const optionElements = optionsWrapper.querySelectorAll(
-      '[w-filter-sort-option="option-text"]'
-    );
+    const optionElements = optionsWrapper.querySelectorAll('[w-filter-sort-option="option-text"]');
     // console.log("Found option elements:", optionElements.length);
 
     // Store the placeholder option if it exists
     const placeholder = select.options[0];
 
     // Clear existing options
-    select.innerHTML = "";
+    select.innerHTML = '';
 
     // Restore placeholder if it existed
     if (placeholder) {
@@ -276,18 +255,18 @@ export class FilterSortManager {
 
     // Add new options
     optionElements.forEach((optionEl) => {
-      const option = document.createElement("option");
+      const option = document.createElement('option');
       option.text = optionEl.textContent;
       option.value = JSON.stringify({
-        orderBy: optionEl.getAttribute("w-filter-sort-orderby"),
-        sortBy: optionEl.getAttribute("w-filter-sort-sortby"),
+        orderBy: optionEl.getAttribute('w-filter-sort-orderby'),
+        sortBy: optionEl.getAttribute('w-filter-sort-sortby'),
       });
       select.add(option);
       // console.log("Added option:", option.text, option.value);
     });
 
     // Initialize Wized variable if needed
-    if (typeof this.Wized.data.v[variableName] === "undefined") {
+    if (typeof this.Wized.data.v[variableName] === 'undefined') {
       this.Wized.data.v[variableName] = [];
     }
 
@@ -298,7 +277,7 @@ export class FilterSortManager {
     }
 
     // Add change handler
-    select.addEventListener("change", async () => {
+    select.addEventListener('change', async () => {
       // console.log("Sort selection changed");
 
       if (this.state.processingChange) return;
@@ -311,11 +290,7 @@ export class FilterSortManager {
         // console.log("Chips: Stored selection:", { selectedValue, selectedIndex });
 
         // Clear existing chips for this category if chips manager is available
-        if (
-          window.filterChips &&
-          window.filterChipsReady &&
-          window.filterChips.clearCategory
-        ) {
+        if (window.filterChips && window.filterChipsReady && window.filterChips.clearCategory) {
           // console.log("Chips: Clearing chips for category:", category);
           window.filterChips.clearCategory(category);
         }
@@ -331,16 +306,15 @@ export class FilterSortManager {
             const selectedOption = JSON.parse(selectedValue);
             sortValue = [
               {
-                orderBy: selectedOption.orderBy || "",
-                sortBy: selectedOption.sortBy || "",
+                orderBy: selectedOption.orderBy || '',
+                sortBy: selectedOption.sortBy || '',
               },
             ];
 
             // Create chip if an option is selected and chips manager is available
             if (window.filterChips && window.filterChipsReady) {
               const selectedText = select.options[selectedIndex].text;
-              const categoryLabel =
-                category.charAt(0).toUpperCase() + category.slice(1);
+              const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
 
               // console.log("Chips: Creating new chip with:", {
               //   selectedText,
@@ -350,7 +324,7 @@ export class FilterSortManager {
 
               const chip = window.filterChips.create({
                 label: `${categoryLabel}: ${selectedText}`,
-                filterType: "sort",
+                filterType: 'sort',
                 category: category,
                 value: selectedValue,
                 sourceElement: select,
@@ -425,9 +399,7 @@ export class FilterSortManager {
     // console.log("FilterSortManager: Setting up filter monitoring...");
 
     // First try to find all sort selects anywhere in the document
-    const allSortSelects = document.querySelectorAll(
-      "select[w-filter-sort-variable]"
-    );
+    const allSortSelects = document.querySelectorAll('select[w-filter-sort-variable]');
     // console.log("FilterSortManager: All sort selects in document:", {
     //   count: allSortSelects.length,
     //   elements: Array.from(allSortSelects).map((select) => ({
@@ -444,15 +416,13 @@ export class FilterSortManager {
     }
 
     // If no sort selects found, try to find them within the wrapper
-    const filterWrapper = document.querySelector("[w-filter-wrapper]");
+    const filterWrapper = document.querySelector('[w-filter-wrapper]');
     if (!filterWrapper) {
       // console.warn("FilterSortManager: No filter wrapper found");
       return;
     }
 
-    const sortSelects = filterWrapper.querySelectorAll(
-      "select[w-filter-sort-variable]"
-    );
+    const sortSelects = filterWrapper.querySelectorAll('select[w-filter-sort-variable]');
 
     if (sortSelects.length === 0) {
       // console.warn("FilterSortManager: No sort selects found in wrapper");
@@ -479,18 +449,14 @@ export class FilterSortManager {
     // console.log("FilterSortManager: Starting sort reset...");
 
     // First try to find the sort select directly
-    const sortSelect = document.querySelector("select[w-filter-sort-variable]");
+    const sortSelect = document.querySelector('select[w-filter-sort-variable]');
     if (sortSelect) {
       // console.log("FilterSortManager: Found sort select directly");
-      const variableName = sortSelect.getAttribute("w-filter-sort-variable");
-      const category = sortSelect.getAttribute("w-filter-sort-category");
+      const variableName = sortSelect.getAttribute('w-filter-sort-variable');
+      const category = sortSelect.getAttribute('w-filter-sort-category');
 
       // Clear chips for this category if chips manager is available
-      if (
-        window.filterChips &&
-        window.filterChipsReady &&
-        window.filterChips.clearCategory
-      ) {
+      if (window.filterChips && window.filterChipsReady && window.filterChips.clearCategory) {
         window.filterChips.clearCategory(category);
       }
 
@@ -502,15 +468,13 @@ export class FilterSortManager {
 
     // If direct select not found, try through filter wrapper
     // console.log("FilterSortManager: Trying to find sort select through wrapper...");
-    const filterWrapper = document.querySelector("[w-filter-wrapper]");
+    const filterWrapper = document.querySelector('[w-filter-wrapper]');
     if (!filterWrapper) {
       // console.warn("FilterSortManager: No filter wrapper found for reset");
       return;
     }
 
-    const sortSelects = filterWrapper.querySelectorAll(
-      "select[w-filter-sort-variable]"
-    );
+    const sortSelects = filterWrapper.querySelectorAll('select[w-filter-sort-variable]');
     // console.log("FilterSortManager: Found sort selects in wrapper:", sortSelects.length);
 
     if (sortSelects.length === 0) {
@@ -519,16 +483,12 @@ export class FilterSortManager {
     }
 
     for (const select of sortSelects) {
-      const variableName = select.getAttribute("w-filter-sort-variable");
-      const category = select.getAttribute("w-filter-sort-category");
+      const variableName = select.getAttribute('w-filter-sort-variable');
+      const category = select.getAttribute('w-filter-sort-category');
       // console.log("FilterSortManager: Resetting sort select:", variableName);
 
       // Clear chips for this category if chips manager is available
-      if (
-        window.filterChips &&
-        window.filterChipsReady &&
-        window.filterChips.clearCategory
-      ) {
+      if (window.filterChips && window.filterChipsReady && window.filterChips.clearCategory) {
         window.filterChips.clearCategory(category);
       }
 

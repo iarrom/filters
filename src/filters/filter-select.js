@@ -41,7 +41,7 @@ export class FilterSelectManager {
     window.resetAllSelectInputs = this.resetAllSelectInputs;
 
     // Set up request monitoring
-    this.Wized.on("requestend", this.handleRequestEnd);
+    this.Wized.on('requestend', this.handleRequestEnd);
 
     this.state.initialized = true;
   }
@@ -51,16 +51,16 @@ export class FilterSelectManager {
   // =============================================
 
   getSelectedValue(select) {
-    return select.value || "";
+    return select.value || '';
   }
 
   getSelectedText(select) {
-    return select.options[select.selectedIndex]?.text || "";
+    return select.options[select.selectedIndex]?.text || '';
   }
 
   createSelectIdentifier(select) {
-    const category = select.getAttribute("w-filter-select-category") || "";
-    const variable = select.getAttribute("w-filter-select-variable") || "";
+    const category = select.getAttribute('w-filter-select-category') || '';
+    const variable = select.getAttribute('w-filter-select-variable') || '';
     return `${category}-${variable}`;
   }
 
@@ -76,17 +76,13 @@ export class FilterSelectManager {
     const text = this.getSelectedText(select);
     if (!value || !text) return;
 
-    const variableName = select.getAttribute("w-filter-select-variable");
-    const paginationVariable = select.getAttribute(
-      "w-filter-pagination-current-variable"
-    );
-    const filterRequest = select.getAttribute("w-filter-request");
+    const variableName = select.getAttribute('w-filter-select-variable');
+    const paginationVariable = select.getAttribute('w-filter-pagination-current-variable');
+    const filterRequest = select.getAttribute('w-filter-request');
 
     const chip = window.filterChips.create({
-      label: `${
-        category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()
-      }: ${text}`,
-      filterType: "select",
+      label: `${category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}: ${text}`,
+      filterType: 'select',
       category,
       value: value,
       sourceElement: select,
@@ -116,7 +112,7 @@ export class FilterSelectManager {
   // =============================================
 
   findOptionsWrapper(select) {
-    const category = select.getAttribute("w-filter-select-category");
+    const category = select.getAttribute('w-filter-select-category');
     if (!category) return null;
 
     return document.querySelector(
@@ -134,10 +130,8 @@ export class FilterSelectManager {
     );
 
     return optionTexts.map((textEl, index) => {
-      const text = textEl.textContent || "";
-      const value = optionValues[index]
-        ? optionValues[index].textContent || ""
-        : text;
+      const text = textEl.textContent || '';
+      const value = optionValues[index] ? optionValues[index].textContent || '' : text;
       return { text, value };
     });
   }
@@ -147,7 +141,7 @@ export class FilterSelectManager {
     const placeholder = select.options[0];
 
     // Clear all options
-    select.innerHTML = "";
+    select.innerHTML = '';
 
     // Restore placeholder
     if (placeholder) {
@@ -159,17 +153,14 @@ export class FilterSelectManager {
 
     // Add new options
     options.forEach(({ text, value }) => {
-      const option = document.createElement("option");
+      const option = document.createElement('option');
       option.text = text;
       option.value = value;
       select.add(option);
     });
 
     // Restore previous value if it still exists
-    if (
-      currentValue &&
-      Array.from(select.options).some((opt) => opt.value === currentValue)
-    ) {
+    if (currentValue && Array.from(select.options).some((opt) => opt.value === currentValue)) {
       select.value = currentValue;
     }
   }
@@ -185,7 +176,7 @@ export class FilterSelectManager {
     filterRequest,
     forceEmpty = false
   ) {
-    const value = forceEmpty ? "" : this.getSelectedValue(select);
+    const value = forceEmpty ? '' : this.getSelectedValue(select);
 
     // Update Wized variable
     this.Wized.data.v[variableName] = value;
@@ -209,13 +200,7 @@ export class FilterSelectManager {
   // RESET FUNCTIONALITY
   // =============================================
 
-  setupResetButton(
-    select,
-    category,
-    variableName,
-    paginationVariable,
-    filterRequest
-  ) {
+  setupResetButton(select, category, variableName, paginationVariable, filterRequest) {
     if (!category || !filterRequest) return;
 
     const resetButton = document.querySelector(
@@ -224,28 +209,18 @@ export class FilterSelectManager {
 
     if (!resetButton) return;
 
-    resetButton.addEventListener("click", async (e) => {
+    resetButton.addEventListener('click', async (e) => {
       e.preventDefault();
 
       // Clear chips for this category if available
-      if (
-        window.filterChips &&
-        window.filterChipsReady &&
-        window.filterChips.clearCategory
-      ) {
+      if (window.filterChips && window.filterChipsReady && window.filterChips.clearCategory) {
         window.filterChips.clearCategory(category);
       }
 
       // Reset select to first option
       select.selectedIndex = 0;
 
-      await this.updateWizedVariable(
-        select,
-        variableName,
-        paginationVariable,
-        filterRequest,
-        true
-      );
+      await this.updateWizedVariable(select, variableName, paginationVariable, filterRequest, true);
     });
   }
 
@@ -254,13 +229,7 @@ export class FilterSelectManager {
   // =============================================
 
   setupDynamicSelect(group) {
-    const {
-      element: select,
-      requestName,
-      variableName,
-      paginationVariable,
-      filterRequest,
-    } = group;
+    const { element: select, requestName, variableName, paginationVariable, filterRequest } = group;
 
     const wrapper = this.findOptionsWrapper(select);
     if (!wrapper) return;
@@ -269,18 +238,13 @@ export class FilterSelectManager {
     this.state.dynamicSelects.set(select, { wrapper, requestName });
 
     // Monitor for option updates
-    this.Wized.on("requestend", (result) => {
+    this.Wized.on('requestend', (result) => {
       if (result.id === requestName || result.name === requestName) {
         this.updateSelectOptions(select, wrapper);
 
         const currentValue = select.value;
         if (currentValue && currentValue !== this.Wized.data.v[variableName]) {
-          this.updateWizedVariable(
-            select,
-            variableName,
-            paginationVariable,
-            filterRequest
-          );
+          this.updateWizedVariable(select, variableName, paginationVariable, filterRequest);
         }
       }
     });
@@ -296,31 +260,23 @@ export class FilterSelectManager {
 
     this.state.monitoredSelects.add(identifier);
 
-    const variableName = select.getAttribute("w-filter-select-variable");
-    const paginationVariable = select.getAttribute(
-      "w-filter-pagination-current-variable"
-    );
-    const filterRequest = select.getAttribute("w-filter-request");
-    const requestName = select.getAttribute("w-filter-select-request");
-    const category = select.getAttribute("w-filter-select-category");
+    const variableName = select.getAttribute('w-filter-select-variable');
+    const paginationVariable = select.getAttribute('w-filter-pagination-current-variable');
+    const filterRequest = select.getAttribute('w-filter-request');
+    const requestName = select.getAttribute('w-filter-select-request');
+    const category = select.getAttribute('w-filter-select-category');
     const isDynamic = !!requestName;
 
     // Initialize Wized variable if needed
-    if (typeof this.Wized.data.v[variableName] === "undefined") {
-      this.Wized.data.v[variableName] = "";
+    if (typeof this.Wized.data.v[variableName] === 'undefined') {
+      this.Wized.data.v[variableName] = '';
     }
 
     // Setup reset functionality
-    this.setupResetButton(
-      select,
-      category,
-      variableName,
-      paginationVariable,
-      filterRequest
-    );
+    this.setupResetButton(select, category, variableName, paginationVariable, filterRequest);
 
     // Add change handler
-    select.addEventListener("change", () => {
+    select.addEventListener('change', () => {
       if (this.state.processingChange) return;
       this.state.processingChange = true;
 
@@ -330,11 +286,7 @@ export class FilterSelectManager {
         const selectedIndex = select.selectedIndex;
 
         // Clear existing chips if available
-        if (
-          window.filterChips &&
-          window.filterChipsReady &&
-          window.filterChips.clearCategory
-        ) {
+        if (window.filterChips && window.filterChipsReady && window.filterChips.clearCategory) {
           window.filterChips.clearCategory(category);
         }
 
@@ -347,14 +299,9 @@ export class FilterSelectManager {
         }
 
         // Update Wized variable
-        this.updateWizedVariable(
-          select,
-          variableName,
-          paginationVariable,
-          filterRequest
-        );
+        this.updateWizedVariable(select, variableName, paginationVariable, filterRequest);
       } catch (error) {
-        console.error("Error handling select change:", error);
+        console.error('Error handling select change:', error);
       } finally {
         this.state.processingChange = false;
       }
@@ -373,12 +320,10 @@ export class FilterSelectManager {
   }
 
   setupFilterMonitoring() {
-    const filterWrapper = document.querySelector("[w-filter-wrapper]");
+    const filterWrapper = document.querySelector('[w-filter-wrapper]');
     if (!filterWrapper) return;
 
-    const selects = filterWrapper.querySelectorAll(
-      "select[w-filter-select-variable]"
-    );
+    const selects = filterWrapper.querySelectorAll('select[w-filter-select-variable]');
 
     if (selects.length === 0) return;
 
@@ -398,28 +343,22 @@ export class FilterSelectManager {
   // =============================================
 
   async resetAllSelectInputs() {
-    const filterWrapper = document.querySelector("[w-filter-wrapper]");
+    const filterWrapper = document.querySelector('[w-filter-wrapper]');
     if (!filterWrapper) return;
 
-    const selects = filterWrapper.querySelectorAll(
-      "select[w-filter-select-variable]"
-    );
+    const selects = filterWrapper.querySelectorAll('select[w-filter-select-variable]');
 
     if (selects.length === 0) return;
 
     // Clear all select chips if available
-    if (
-      window.filterChips &&
-      window.filterChipsReady &&
-      window.filterChips.clearAll
-    ) {
+    if (window.filterChips && window.filterChipsReady && window.filterChips.clearAll) {
       window.filterChips.clearAll();
     }
 
     for (const select of selects) {
-      const variableName = select.getAttribute("w-filter-select-variable");
+      const variableName = select.getAttribute('w-filter-select-variable');
       select.selectedIndex = 0;
-      this.Wized.data.v[variableName] = "";
+      this.Wized.data.v[variableName] = '';
     }
   }
 }
