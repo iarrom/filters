@@ -2,9 +2,45 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Wized Filter and Pagination Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wized Filter Development</title>
   </head>
   <body>
+    <h1>Wized Filter Development</h1>
+
+    <!-- Example filter elements -->
+    <div class="filter-section">
+      <h2>Checkbox Filters</h2>
+      <div data-wized-filter="checkbox">
+        <label><input type="checkbox" value="option1" /> Option 1</label>
+        <label><input type="checkbox" value="option2" /> Option 2</label>
+      </div>
+
+      <h2>Select Range Filter</h2>
+      <div data-wized-filter="select-range">
+        <select>
+          <option value="0-10">0-10</option>
+          <option value="11-20">11-20</option>
+          <option value="21-30">21-30</option>
+        </select>
+      </div>
+
+      <h2>Sort</h2>
+      <div data-wized-filter="sort">
+        <select>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+        </select>
+      </div>
+
+      <h2>Pagination</h2>
+      <div data-wized-filter="pagination">
+        <button data-page="prev">Previous</button>
+        <span data-page-info>Page 1</span>
+        <button data-page="next">Next</button>
+      </div>
+    </div>
+
     <script type="module" src="./index.js"></script>
   </body>
 </html>
