@@ -5,7 +5,6 @@ import Wized from '../../__mocks__/wized';
 
 describe('FilterRadioManager', () => {
   let manager;
-  const _mockElement = document.createElement('div');
 
   beforeEach(() => {
     // Clear all mocks before each test

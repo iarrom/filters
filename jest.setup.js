@@ -15,6 +15,9 @@ global.Wized = {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
+  /**
+   * @param {Function} _callback - Callback function for intersection events (unused in mock)
+   */
   constructor(_callback) {
     // Implementation for tests
   }
@@ -58,12 +61,19 @@ global.window = {
 
 // Mock MutationObserver
 global.MutationObserver = class {
+  /**
+   * @param {Function} _callback - Callback function for mutation events (unused in mock)
+   */
   constructor(_callback) {
     // Implementation for tests
   }
   disconnect() {
     // Implementation for tests
   }
+  /**
+   * @param {Element} _element - The element to observe (unused in mock)
+   * @param {Object} _initObject - Observer configuration (unused in mock)
+   */
   observe(_element, _initObject) {
     // Implementation for tests
   }
