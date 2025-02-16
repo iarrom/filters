@@ -18,12 +18,12 @@ export class FilterCheckboxManager {
       checkboxGroups: null, // Stores organized checkbox group data
     };
 
-    // Bind methods to maintain context
+    // Bind methods
     this.setupFilterMonitoring = this.setupFilterMonitoring.bind(this);
     this.handleRequestEnd = this.handleRequestEnd.bind(this);
     this.uncheckAllFilterCheckboxes = this.uncheckAllFilterCheckboxes.bind(this);
 
-    // Initialize the manager
+    // Initialize immediately
     this.initialize();
   }
 
@@ -81,29 +81,23 @@ export class FilterCheckboxManager {
    * @param {string} category - The filter category
    */
   createCheckboxChip(checkbox, category) {
-    // Skip if chips functionality is not available
     if (!window.filterChips) return;
 
     const label = this.getCheckboxLabel(checkbox);
     if (!label) return;
 
-    // Store variable information for callbacks
     const variableName = checkbox.getAttribute('w-filter-checkbox-variable');
     const paginationVariable = checkbox.getAttribute('w-filter-pagination-current-variable');
     const filterRequest = checkbox.getAttribute('w-filter-request');
 
-    // Create the chip with necessary callbacks
     const chip = window.filterChips.create({
-      label: `${category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}: ${label}`,
+      label: `${category.toUpperCase()}: ${label}`,
       filterType: 'checkbox',
       category,
       value: label,
       sourceElement: checkbox,
       onSourceUpdate: () => {
-        // Uncheck the checkbox
         this.updateCheckboxVisualState(checkbox, false);
-
-        // Update Wized variable and execute request
         this.updateWizedVariable(
           this.getCheckboxGroup(checkbox),
           variableName,
@@ -113,7 +107,6 @@ export class FilterCheckboxManager {
       },
     });
 
-    // Only try to add chip if it was created successfully
     if (chip && window.filterChips.addToContainer) {
       window.filterChips.addToContainer(chip);
     }
@@ -144,7 +137,6 @@ export class FilterCheckboxManager {
     forceEmpty = false,
     isReset = false
   ) {
-    // Calculate checked values
     const checkedValues = forceEmpty
       ? []
       : Array.from(checkboxes)
@@ -153,25 +145,21 @@ export class FilterCheckboxManager {
           )
           .map(this.getCheckboxLabel);
 
-    // Update Wized variable
     this.Wized.data.v[variableName] = checkedValues;
 
-    // Determine if updates needed
     const shouldTriggerUpdates =
       isReset || checkedValues.length > 0 || (!forceEmpty && checkedValues.length === 0);
 
     if (shouldTriggerUpdates) {
-      // Reset pagination if needed
       if (paginationVariable) {
         this.Wized.data.v[paginationVariable] = 1;
       }
 
-      // Execute filter request if provided
       if (filterRequest) {
         try {
           await this.Wized.requests.execute(filterRequest);
         } catch (error) {
-          console.error(`Error executing filter request: ${error}`);
+          console.error(`Error executing filter request:`, error);
         }
       }
     }
@@ -195,7 +183,6 @@ export class FilterCheckboxManager {
     if (!category || !filterRequest) return;
 
     const resetButton = document.querySelector(`[w-filter-checkbox-reset="${category}"]`);
-
     if (!resetButton) return;
 
     resetButton.addEventListener('click', async (e) => {
@@ -208,12 +195,10 @@ export class FilterCheckboxManager {
       const variableName = firstCheckbox.getAttribute('w-filter-checkbox-variable');
       const paginationVariable = firstCheckbox.getAttribute('w-filter-pagination-current-variable');
 
-      // Clear chips for this category
       if (window.filterChips) {
         window.filterChips.clearCategory(category);
       }
 
-      // Uncheck all checkboxes visually
       checkboxes.forEach((checkbox) => {
         this.updateCheckboxVisualState(checkbox, false);
       });
@@ -283,10 +268,8 @@ export class FilterCheckboxManager {
         '.w-checkbox-input--inputType-custom.w--redirected-checked'
       );
 
-      // Handle chips if the chips manager is available and initialized
       if (window.filterChips && window.filterChipsReady) {
         if (isChecked) {
-          // Check if chip already exists before trying to create it
           if (!window.filterChips.exists || !window.filterChips.exists(category, label)) {
             this.createCheckboxChip(checkbox, category);
           }
@@ -299,9 +282,6 @@ export class FilterCheckboxManager {
     }, 50);
   }
 
-  /**
-   * Sets up event handlers for a checkbox group
-   */
   setupGroupEventHandlers(group) {
     const {
       wizedName,
@@ -339,7 +319,7 @@ export class FilterCheckboxManager {
       if (!isStatic && requestName) {
         this.Wized.on('requestend', (filterResult) => {
           if (filterResult.id === requestName || filterResult.name === requestName) {
-            this.updateCheckboxStates();
+            // Dynamic filter request completed
           }
         });
       }
@@ -349,10 +329,13 @@ export class FilterCheckboxManager {
   /**
    * Handles request completion events
    */
-  handleRequestEnd(filterResult) {
-    const requestName = this.requestName;
-    if (filterResult.id === requestName || filterResult.name === requestName) {
-      this.updateCheckboxStates();
+  handleRequestEnd(result) {
+    const checkboxGroups = this.setupFilterMonitoring();
+
+    if (checkboxGroups) {
+      Object.values(checkboxGroups).forEach((group) => {
+        this.setupGroupEventHandlers(group);
+      });
     }
   }
 

@@ -7,10 +7,8 @@ export class FilterRadioManager {
 
     // Internal state
     this.state = {
-      monitoredGroups: new Set(),
-      radioGroups: null,
-      initialized: false,
-      processingClick: false, // Prevent multiple simultaneous clicks
+      monitoredGroups: new Set(), // Tracks which radio groups are being monitored
+      radioGroups: null, // Stores organized radio group data
     };
 
     // Bind methods
@@ -27,10 +25,11 @@ export class FilterRadioManager {
   // =============================================
 
   initialize() {
-    if (this.state.initialized) return;
+    // Make uncheck function globally available
     window.uncheckAllRadioButtons = this.uncheckAllRadioButtons;
+
+    // Set up request monitoring
     this.Wized.on('requestend', this.handleRequestEnd);
-    this.state.initialized = true;
   }
 
   // =============================================
@@ -57,8 +56,7 @@ export class FilterRadioManager {
   // =============================================
 
   createRadioChip(radio, category) {
-    // Skip if chips functionality is not available
-    if (!window.filterChips || !window.filterChipsReady) return;
+    if (!window.filterChips) return;
 
     const label = this.getRadioLabel(radio);
     if (!label) return;
@@ -68,21 +66,16 @@ export class FilterRadioManager {
     const filterRequest = radio.getAttribute('w-filter-request');
 
     const chip = window.filterChips.create({
-      label: `${category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}: ${label}`,
+      label: `${category.toUpperCase()}: ${label}`,
       filterType: 'radio',
       category,
       value: label,
       sourceElement: radio,
       onSourceUpdate: async () => {
-        // Find all radios in the same group
         const group = document.querySelectorAll(`[w-filter-radio-variable="${variableName}"]`);
-
-        // Uncheck all radios visually
         group.forEach((groupRadio) => {
           this.updateRadioVisualState(groupRadio, false);
         });
-
-        // Reset the variable and update state
         await this.updateWizedVariable(
           Array.from(group),
           variableName,
@@ -93,7 +86,6 @@ export class FilterRadioManager {
       },
     });
 
-    // Only try to add chip if it was created successfully
     if (chip && window.filterChips.addToContainer) {
       window.filterChips.addToContainer(chip);
     }
@@ -110,7 +102,6 @@ export class FilterRadioManager {
     filterRequest,
     forceEmpty = false
   ) {
-    // Get selected value
     const selectedValue = forceEmpty
       ? ''
       : Array.from(radios).find((radio) =>
@@ -118,21 +109,17 @@ export class FilterRadioManager {
         );
 
     const value = selectedValue ? this.getRadioLabel(selectedValue) : '';
-
-    // Update Wized variable
     this.Wized.data.v[variableName] = value;
 
-    // Reset pagination if needed
     if (paginationVariable) {
       this.Wized.data.v[paginationVariable] = 1;
     }
 
-    // Execute filter request if provided
     if (filterRequest) {
       try {
         await this.Wized.requests.execute(filterRequest);
       } catch (error) {
-        console.error(`Error executing filter request: ${error}`);
+        console.error(`Error executing filter request:`, error);
       }
     }
   }
@@ -152,7 +139,6 @@ export class FilterRadioManager {
     if (!category || !filterRequest) return;
 
     const resetButton = document.querySelector(`[w-filter-radio-reset="${category}"]`);
-
     if (!resetButton) return;
 
     resetButton.addEventListener('click', async (e) => {
@@ -161,12 +147,10 @@ export class FilterRadioManager {
       const variableName = firstRadio.getAttribute('w-filter-radio-variable');
       const paginationVariable = firstRadio.getAttribute('w-filter-pagination-current-variable');
 
-      // Clear chips for this category if available
-      if (window.filterChips && window.filterChipsReady && window.filterChips.clearCategory) {
+      if (window.filterChips) {
         window.filterChips.clearCategory(category);
       }
 
-      // Uncheck all radios visually
       radios.forEach((radio) => {
         this.updateRadioVisualState(radio, false);
       });
@@ -216,33 +200,20 @@ export class FilterRadioManager {
   // =============================================
 
   handleRadioClick(radio, elements, variableName, paginationVariable, filterRequest) {
-    // Prevent multiple simultaneous clicks
-    if (this.state.processingClick) return;
-    this.state.processingClick = true;
+    setTimeout(() => {
+      const category = radio.getAttribute('w-filter-radio-category');
 
-    const category = radio.getAttribute('w-filter-radio-category');
-
-    try {
-      // Clear existing chips if available
-      if (window.filterChips && window.filterChipsReady && window.filterChips.clearCategory) {
+      if (window.filterChips) {
         window.filterChips.clearCategory(category);
       }
 
-      // Update visual state of all radios in the group
       elements.forEach((otherRadio) => {
         this.updateRadioVisualState(otherRadio, otherRadio === radio);
       });
 
-      // Create new chip after visual state is updated if chips are available
       this.createRadioChip(radio, category);
-
-      // Update Wized variable
       this.updateWizedVariable(elements, variableName, paginationVariable, filterRequest);
-    } catch (error) {
-      console.error('Error handling radio click:', error);
-    } finally {
-      this.state.processingClick = false;
-    }
+    }, 50);
   }
 
   setupGroupEventHandlers(group) {
@@ -261,36 +232,36 @@ export class FilterRadioManager {
     if (!this.state.monitoredGroups.has(groupKey)) {
       this.state.monitoredGroups.add(groupKey);
 
-      // Initialize Wized variable if needed
-      if (typeof this.Wized.data.v[variableName] === 'undefined') {
+      if (!this.Wized.data.v[variableName]) {
         this.Wized.data.v[variableName] = '';
       }
 
       this.setupResetButton(group);
 
-      // Add click handlers to radios
       elements.forEach((radio) => {
         radio.addEventListener('click', (e) => {
-          e.preventDefault(); // Prevent default to handle state manually
+          e.preventDefault();
           this.handleRadioClick(radio, elements, variableName, paginationVariable, filterRequest);
         });
       });
 
-      // Monitor dynamic filter requests
       if (!isStatic && requestName) {
         this.Wized.on('requestend', (filterResult) => {
           if (filterResult.id === requestName || filterResult.name === requestName) {
-            this.updateRadioStates();
+            // Dynamic filter request completed
           }
         });
       }
     }
   }
 
-  handleRequestEnd(filterResult) {
-    const requestName = this.requestName;
-    if (filterResult.id === requestName || filterResult.name === requestName) {
-      this.updateRadioStates();
+  handleRequestEnd(result) {
+    const radioGroups = this.setupFilterMonitoring();
+
+    if (radioGroups) {
+      Object.values(radioGroups).forEach((group) => {
+        this.setupGroupEventHandlers(group);
+      });
     }
   }
 
@@ -303,10 +274,8 @@ export class FilterRadioManager {
     if (!filterWrapper) return;
 
     const radios = filterWrapper.querySelectorAll('label[wized][w-filter-radio-variable]');
-
     if (radios.length === 0) return;
 
-    // Clear all radio chips if available
     if (window.filterChips && window.filterChipsReady && window.filterChips.clearAll) {
       window.filterChips.clearAll();
     }
@@ -321,12 +290,10 @@ export class FilterRadioManager {
     }, {});
 
     for (const [variableName, radioGroup] of Object.entries(groupedByVariable)) {
-      // Reset UI state
       radioGroup.forEach((radio) => {
         this.updateRadioVisualState(radio, false);
       });
 
-      // Reset Wized variable
       this.Wized.data.v[variableName] = '';
     }
   }
