@@ -502,7 +502,9 @@ export class FilterSelectRangeManager {
 }
 
 // Initialize Wized and the FilterSelectRangeManager
-window.Wized = window.Wized || [];
-window.Wized.push((Wized) => {
-  new FilterSelectRangeManager(Wized);
-});
+if (typeof window !== 'undefined') {
+  window.Wized = window.Wized || [];
+  window.Wized.push((Wized) => {
+    new FilterSelectRangeManager(Wized);
+  });
+}
