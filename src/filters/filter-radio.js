@@ -1,7 +1,7 @@
 /**
  * FilterRadioManager: Main class responsible for managing radio-based filtering functionality
  */
-export class FilterRadioManager {
+export default class FilterRadioManager {
   constructor(Wized) {
     this.Wized = Wized;
 

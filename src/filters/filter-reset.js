@@ -5,7 +5,7 @@
  * 1. Finding and monitoring the main reset button
  * 2. Coordinating reset operations across all filter types (checkbox, radio, select, sort)
  */
-export class FilterResetManager {
+export default class FilterResetManager {
   constructor(Wized) {
     this.Wized = Wized;
     this.setupMainResetButton();

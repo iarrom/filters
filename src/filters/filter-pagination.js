@@ -8,7 +8,7 @@
  * 4. Data Merging: Manages merging new data with existing results
  * 5. Variable Management: Handles pagination-related variables (next, current page)
  */
-export class FilterPaginationManager {
+export default class FilterPaginationManager {
   constructor(Wized) {
     // console.log("FilterPaginationManager: Initializing");
     this.Wized = Wized;

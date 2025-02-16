@@ -8,7 +8,7 @@
  * 4. Wized Integration: Coordinates with Wized for data and requests
  * 5. Chips Integration: Coordinates with FilterChipsManager for visual feedback
  */
-export class FilterCheckboxManager {
+class FilterCheckboxManager {
   constructor(Wized) {
     this.Wized = Wized;
 
@@ -377,3 +377,5 @@ export class FilterCheckboxManager {
     }
   }
 }
+
+export default FilterCheckboxManager;

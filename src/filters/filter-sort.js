@@ -7,7 +7,7 @@
  * 3. Event Handling: Manages change events and request completions
  * 4. Wized Integration: Coordinates with Wized for data and requests
  */
-export class FilterSortManager {
+export default class FilterSortManager {
   constructor(Wized) {
     // console.log("FilterSortManager: Initializing...");
     this.Wized = Wized;

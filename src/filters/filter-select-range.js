@@ -8,7 +8,7 @@
  * 4. Wized Integration: Coordinates with Wized for data and requests
  * 5. Dynamic Options: Manages dynamic option updates
  */
-export class FilterSelectRangeManager {
+export default class FilterSelectRangeManager {
   constructor(Wized) {
     this.Wized = Wized;
 

@@ -9,7 +9,7 @@
  * 5. Chips Integration: Coordinates with FilterChipsManager for visual feedback
  * 6. Dynamic Options: Manages dynamic option updates
  */
-export class FilterSelectManager {
+export default class FilterSelectManager {
   constructor(Wized) {
     this.Wized = Wized;
 
