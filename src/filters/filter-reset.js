@@ -1,15 +1,49 @@
 /**
- * FilterResetManager: Main class responsible for resetting all filter types
+ * FilterResetManager: Main class responsible for managing global filter reset functionality
  *
  * This class handles:
- * 1. Finding and monitoring the main reset button
- * 2. Coordinating reset operations across all filter types (checkbox, radio, select, sort)
+ * 1. State Management: Tracks active filter states across all filter types
+ * 2. UI Management: Handles reset button interactions
+ * 3. Event Handling: Manages click events and request completions
+ * 4. Wized Integration: Coordinates with Wized for data and requests
+ * 5. Cross-Filter Coordination: Manages reset operations across all filter types
  */
 export default class FilterResetManager {
   constructor(Wized) {
     this.Wized = Wized;
-    this.setupMainResetButton();
+
+    // Internal state
+    this.state = {
+      initialized: false,
+      processingReset: false, // Prevent multiple simultaneous resets
+      mainResetButton: null,
+    };
+
+    // Bind methods
+    this.setupMainResetButton = this.setupMainResetButton.bind(this);
+    this.checkForActiveFilters = this.checkForActiveFilters.bind(this);
+    this.resetAllFilters = this.resetAllFilters.bind(this);
+
+    // Initialize immediately
+    this.initialize();
   }
+
+  // =============================================
+  // INITIALIZATION AND SETUP
+  // =============================================
+
+  /**
+   * Initializes the manager and sets up event listeners
+   */
+  initialize() {
+    if (this.state.initialized) return;
+    this.setupMainResetButton();
+    this.state.initialized = true;
+  }
+
+  // =============================================
+  // FILTER STATE DETECTION
+  // =============================================
 
   /**
    * Checks if there are any active filters by examining Wized variables
@@ -42,7 +76,6 @@ export default class FilterResetManager {
       if (Array.isArray(value)) {
         // Special handling for sort options
         if (key.includes('_sort')) {
-          // Check if any sort option has non-empty orderBy or sortBy
           const isActive = value.some(
             (item) => item && typeof item === 'object' && (item.orderBy || item.sortBy)
           );
@@ -88,11 +121,18 @@ export default class FilterResetManager {
     return activeFilters.length > 0;
   }
 
+  // =============================================
+  // RESET FUNCTIONALITY
+  // =============================================
+
   /**
    * Resets all filters and executes the filter request
    * @param {HTMLElement} resetButton - The reset button element
    */
   async resetAllFilters(resetButton) {
+    if (this.state.processingReset) return;
+    this.state.processingReset = true;
+
     console.log('=== Starting Filter Reset ===');
     try {
       // Reset all filter types
@@ -146,12 +186,18 @@ export default class FilterResetManager {
       }
     } catch (error) {
       console.error('Error in resetAllFilters:', error);
+    } finally {
+      this.state.processingReset = false;
     }
     console.log('=== Filter Reset Complete ===');
   }
 
+  // =============================================
+  // EVENT HANDLING
+  // =============================================
+
   /**
-   * Sets up the main reset button event listener
+   * Sets up the main reset button event listener and initializes its state
    */
   setupMainResetButton() {
     console.log('=== Setting up Reset Button ===');
@@ -162,6 +208,8 @@ export default class FilterResetManager {
       console.log('No reset button found, exiting setup');
       return;
     }
+
+    this.state.mainResetButton = resetButton;
 
     resetButton.addEventListener('click', async (e) => {
       e.preventDefault();
@@ -182,4 +230,12 @@ export default class FilterResetManager {
     });
     console.log('Reset button setup complete');
   }
+}
+
+// Initialize Wized and the FilterResetManager
+if (typeof window !== 'undefined') {
+  window.Wized = window.Wized || [];
+  window.Wized.push((Wized) => {
+    new FilterResetManager(Wized);
+  });
 }
