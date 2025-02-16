@@ -1,0 +1,44 @@
+name: Staging Version Bump
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'Release') }}
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      - name: Configure Git
+        run: |
+          git config user.name 'GitHub Actions Bot'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Bump Version for Staging
+        run: |
+          # Add -staging suffix to version
+          current_version=$(node -p "require('./package.json').version")
+          npm version "${current_version}-staging.$(date +%Y%m%d%H%M%S)" --no-git-tag-version
+
+          # Commit the change
+          git add package.json package-lock.json
+          git commit -m "chore: bump staging version [skip ci]"
+          git push
