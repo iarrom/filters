@@ -1,7 +1,7 @@
-import { FilterCheckboxManager } from '../../filters/filter-checkbox.js';
+import { FilterRadioManager } from '../../filters/filter-radio.js';
 import mockWized from '../../__mocks__/wized.js';
 
-describe('FilterCheckboxManager', () => {
+describe('FilterRadioManager', () => {
   let manager;
   let mockElement;
 
@@ -9,15 +9,15 @@ describe('FilterCheckboxManager', () => {
     // Reset DOM
     document.body.innerHTML = `
       <div w-filter-wrapper>
-        <label wized="CHECKBOX1" w-filter-checkbox-variable="category" w-filter-checkbox-category="Category" w-filter-request="filterRequest">
-          <div class="w-checkbox-input--inputType-custom"></div>
-          <span w-filter-checkbox-label>Option 1</span>
+        <label wized="RADIO1" w-filter-radio-variable="category" w-filter-radio-category="Category" w-filter-request="filterRequest">
+          <div class="w-form-formradioinput--inputType-custom"></div>
+          <span w-filter-radio-label>Option 1</span>
         </label>
       </div>
     `;
 
     mockElement = document.querySelector('label[wized]');
-    manager = new FilterCheckboxManager(mockWized);
+    manager = new FilterRadioManager(mockWized);
   });
 
   afterEach(() => {
@@ -27,7 +27,7 @@ describe('FilterCheckboxManager', () => {
 
   test('initializes with correct state', () => {
     expect(manager.state.monitoredGroups).toBeDefined();
-    expect(manager.state.checkboxGroups).toBeNull();
+    expect(manager.state.radioGroups).toBeNull();
   });
 
   test('sets up event listeners on initialization', () => {
