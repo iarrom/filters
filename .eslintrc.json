@@ -1,0 +1,37 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "jest": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "globals": {
+    "global": "readonly",
+    "window": "readonly",
+    "document": "readonly"
+  },
+  "rules": {
+    "no-console": ["error", { "allow": ["warn", "error"] }]
+  },
+  "overrides": [
+    {
+      "files": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      "env": {
+        "jest": true
+      },
+      "globals": {
+        "jest": "readonly",
+        "expect": "readonly",
+        "describe": "readonly",
+        "test": "readonly",
+        "beforeEach": "readonly",
+        "afterEach": "readonly"
+      }
+    }
+  ]
+}
