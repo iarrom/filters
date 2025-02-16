@@ -1,12 +1,12 @@
 {
   "name": "wized-filter-and-pagination",
   "version": "1.0.0",
-  "description": "",
-  "main": "filter-checkbox.js",
+  "description": "Wized filter and pagination functionality",
+  "source": "src/index.html",
   "type": "module",
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html",
+    "build": "parcel build src/index.html --dist-dir dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{js,json}\"",
