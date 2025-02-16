@@ -1,6 +1,6 @@
 {
   "name": "wized-filter-and-pagination",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Wized filter and pagination functionality",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
