@@ -11,26 +11,36 @@
     "sourceType": "module"
   },
   "globals": {
-    "global": "readonly",
-    "window": "readonly",
-    "document": "readonly"
+    "global": "writable",
+    "window": "writable",
+    "document": "writable"
   },
   "rules": {
     "no-console": ["error", { "allow": ["warn", "error"] }]
   },
   "overrides": [
     {
-      "files": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      "files": [
+        "**/__tests__/**/*.[jt]s?(x)",
+        "**/?(*.)+(spec|test).[jt]s?(x)",
+        "jest.setup.js",
+        "**/__mocks__/**/*.[jt]s?(x)"
+      ],
       "env": {
-        "jest": true
+        "jest": true,
+        "node": true
       },
       "globals": {
-        "jest": "readonly",
-        "expect": "readonly",
-        "describe": "readonly",
-        "test": "readonly",
-        "beforeEach": "readonly",
-        "afterEach": "readonly"
+        "jest": "writable",
+        "expect": "writable",
+        "describe": "writable",
+        "test": "writable",
+        "it": "writable",
+        "beforeAll": "writable",
+        "beforeEach": "writable",
+        "afterAll": "writable",
+        "afterEach": "writable",
+        "global": "writable"
       }
     }
   ]
