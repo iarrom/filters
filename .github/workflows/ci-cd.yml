@@ -13,59 +13,109 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+      fail-fast: false
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Clean Install Dependencies
+      - name: Get npm cache directory
+        id: npm-cache-dir
         run: |
-          npm cache clean --force
-          rm -rf node_modules package-lock.json
-          npm install
+          echo "dir=$(npm config get cache)" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        id: npm-cache
+        with:
+          path: |
+            ${{ steps.npm-cache-dir.outputs.dir }}
+            **/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install Dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: Run Lint
         run: npm run lint
+        continue-on-error: false
 
       - name: Run Tests
-        run: npm test
+        run: npm run test:ci
+        env:
+          CI: true
+          NODE_ENV: test
 
       - name: Build Code
-        run: npm run build
+        run: |
+          npm run clean
+          npm run build
+        env:
+          CI: true
+          NODE_ENV: production
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-files
+          path: dist/
+          retention-days: 7
 
   deploy-staging:
     needs: build-and-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/staging'
     environment: staging
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-files
+          path: dist
 
       - name: Deploy to Staging
         run: |
           echo "Deploying to staging environment..."
           # Insert your actual deployment command for staging here
-          # For example, for a static site:
-          # npx surge dist/ your-staging-url.surge.sh
+        env:
+          NODE_ENV: staging
 
   deploy-main:
     needs: build-and-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     environment: main
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-files
+          path: dist
 
       - name: Deploy to Main (Production)
         run: |
           echo "Deploying to main (production) environment..."
           # Insert your actual deployment command for production here
-          # For example, publishing to npm:
-          # npm publish --access public
+        env:
+          NODE_ENV: production

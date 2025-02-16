@@ -1,11 +1,15 @@
-const mockWized = {
+/* global jest */
+
+const Wized = {
   data: {
     v: {},
+    r: {},
+    subscribe: jest.fn(),
   },
   requests: {
-    execute: jest.fn().mockResolvedValue({}),
+    execute: jest.fn(),
   },
   on: jest.fn(),
 };
 
-export default mockWized;
+export default Wized;

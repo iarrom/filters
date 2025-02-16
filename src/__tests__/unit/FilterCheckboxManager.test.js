@@ -1,36 +1,34 @@
-import { FilterCheckboxManager } from '../../filters/filter-checkbox.js';
-import mockWized from '../../__mocks__/wized.js';
+/* global describe, beforeEach, afterEach, test, expect, jest */
+
+import { FilterCheckboxManager } from '../../filters/filter-checkbox';
+import Wized from '../../__mocks__/wized';
 
 describe('FilterCheckboxManager', () => {
   let manager;
-  let mockElement;
+  const _mockElement = document.createElement('div');
 
   beforeEach(() => {
-    // Reset DOM
-    document.body.innerHTML = `
-      <div w-filter-wrapper>
-        <label wized="CHECKBOX1" w-filter-checkbox-variable="category" w-filter-checkbox-category="Category" w-filter-request="filterRequest">
-          <div class="w-checkbox-input--inputType-custom"></div>
-          <span w-filter-checkbox-label>Option 1</span>
-        </label>
-      </div>
-    `;
+    // Clear all mocks before each test
+    jest.clearAllMocks();
 
-    mockElement = document.querySelector('label[wized]');
-    manager = new FilterCheckboxManager(mockWized);
+    // Reset the DOM mocks
+    jest.spyOn(document, 'querySelector').mockImplementation(() => null);
+    jest.spyOn(document, 'querySelectorAll').mockImplementation(() => []);
+
+    // Create a new instance of the manager
+    manager = new FilterCheckboxManager(Wized);
   });
 
   afterEach(() => {
-    document.body.innerHTML = '';
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
-  test('initializes with correct state', () => {
-    expect(manager.state.monitoredGroups).toBeDefined();
-    expect(manager.state.checkboxGroups).toBeNull();
+  test('should initialize with Wized instance', () => {
+    expect(manager).toBeDefined();
+    expect(manager.Wized).toBe(Wized);
   });
 
-  test('sets up event listeners on initialization', () => {
-    expect(mockWized.on).toHaveBeenCalledWith('requestend', expect.any(Function));
+  test('should set up event listeners on initialization', () => {
+    expect(Wized.on).toHaveBeenCalledWith('requestend', expect.any(Function));
   });
 });

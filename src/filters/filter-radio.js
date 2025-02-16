@@ -255,7 +255,7 @@ export class FilterRadioManager {
     }
   }
 
-  handleRequestEnd(result) {
+  handleRequestEnd(_result) {
     const radioGroups = this.setupFilterMonitoring();
 
     if (radioGroups) {

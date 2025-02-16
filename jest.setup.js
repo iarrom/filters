@@ -1,3 +1,5 @@
+/* global global, jest, expect */
+
 // Mock the Wized global object
 global.Wized = {
   data: {
@@ -13,8 +15,8 @@ global.Wized = {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
-  constructor(callback) {
-    this.callback = callback;
+  constructor(_callback) {
+    // Implementation for tests
   }
 
   observe() {
@@ -56,9 +58,15 @@ global.window = {
 
 // Mock MutationObserver
 global.MutationObserver = class {
-  constructor(callback) {}
-  disconnect() {}
-  observe(element, initObject) {}
+  constructor(_callback) {
+    // Implementation for tests
+  }
+  disconnect() {
+    // Implementation for tests
+  }
+  observe(_element, _initObject) {
+    // Implementation for tests
+  }
 };
 
 // Add custom jest matchers if needed

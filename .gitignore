@@ -42,3 +42,8 @@ wized-api-doc.md
 *.temp.md
 *.draft.md
 *.local.md
+
+# Backup files
+src/filters(backup)/
+**/filters(backup)/
+**/*backup*/

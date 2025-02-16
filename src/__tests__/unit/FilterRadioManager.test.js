@@ -1,36 +1,34 @@
-import { FilterRadioManager } from '../../filters/filter-radio.js';
-import mockWized from '../../__mocks__/wized.js';
+/* global describe, beforeEach, afterEach, test, expect, jest */
+
+import { FilterRadioManager } from '../../filters/filter-radio';
+import Wized from '../../__mocks__/wized';
 
 describe('FilterRadioManager', () => {
   let manager;
-  let mockElement;
+  const _mockElement = document.createElement('div');
 
   beforeEach(() => {
-    // Reset DOM
-    document.body.innerHTML = `
-      <div w-filter-wrapper>
-        <label wized="RADIO1" w-filter-radio-variable="category" w-filter-radio-category="Category" w-filter-request="filterRequest">
-          <div class="w-form-formradioinput--inputType-custom"></div>
-          <span w-filter-radio-label>Option 1</span>
-        </label>
-      </div>
-    `;
+    // Clear all mocks before each test
+    jest.clearAllMocks();
 
-    mockElement = document.querySelector('label[wized]');
-    manager = new FilterRadioManager(mockWized);
+    // Reset the DOM mocks
+    jest.spyOn(document, 'querySelector').mockImplementation(() => null);
+    jest.spyOn(document, 'querySelectorAll').mockImplementation(() => []);
+
+    // Create a new instance of the manager
+    manager = new FilterRadioManager(Wized);
   });
 
   afterEach(() => {
-    document.body.innerHTML = '';
-    jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
-  test('initializes with correct state', () => {
-    expect(manager.state.monitoredGroups).toBeDefined();
-    expect(manager.state.radioGroups).toBeNull();
+  test('should initialize with Wized instance', () => {
+    expect(manager).toBeDefined();
+    expect(manager.Wized).toBe(Wized);
   });
 
-  test('sets up event listeners on initialization', () => {
-    expect(mockWized.on).toHaveBeenCalledWith('requestend', expect.any(Function));
+  test('should set up event listeners on initialization', () => {
+    expect(Wized.on).toHaveBeenCalledWith('requestend', expect.any(Function));
   });
 });

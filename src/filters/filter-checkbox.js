@@ -329,7 +329,7 @@ export class FilterCheckboxManager {
   /**
    * Handles request completion events
    */
-  handleRequestEnd(result) {
+  handleRequestEnd(_result) {
     const checkboxGroups = this.setupFilterMonitoring();
 
     if (checkboxGroups) {

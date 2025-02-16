@@ -13,10 +13,19 @@
   "globals": {
     "global": "writable",
     "window": "writable",
-    "document": "writable"
+    "document": "writable",
+    "Wized": "writable"
   },
   "rules": {
-    "no-console": ["error", { "allow": ["warn", "error"] }]
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "caughtErrorsIgnorePattern": "^_"
+      }
+    ]
   },
   "overrides": [
     {
@@ -41,6 +50,9 @@
         "afterAll": "writable",
         "afterEach": "writable",
         "global": "writable"
+      },
+      "rules": {
+        "no-unused-vars": "off"
       }
     }
   ]

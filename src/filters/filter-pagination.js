@@ -326,12 +326,12 @@ export class FilterPaginationManager {
 
   /**
    * Handles request completion events
-   * @param {Object} result - The request completion result
+   * @param {Object} _result - The request completion result
    */
-  handleRequestEnd(result) {
+  handleRequestEnd(_result) {
     // console.log(
     //   "FilterPaginationManager: handleRequestEnd called with:",
-    //   result
+    //   _result
     // );
     this.setupFilterMonitoring();
   }
