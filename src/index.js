@@ -1,21 +1,8 @@
-// Import the filter managers from their respective files
-import { FilterCheckboxManager } from './filters/filter-checkbox.js';
-import { FilterRadioManager } from './filters/filter-radio.js';
-import { FilterSelectManager } from './filters/filter-select.js';
-import { FilterSelectRangeManager } from './filters/filter-select-range.js';
-import { FilterChipsManager } from './filters/filter-chips.js';
-import { FilterResetManager } from './filters/filter-reset.js';
-import { FilterSortManager } from './filters/filter-sort.js';
-import { FilterPaginationManager } from './filters/filter-pagination.js';
-
-// Export the classes so they can be imported by users of the package
-export {
-  FilterCheckboxManager,
-  FilterRadioManager,
-  FilterSelectManager,
-  FilterSelectRangeManager,
-  FilterChipsManager,
-  FilterResetManager,
-  FilterSortManager,
-  FilterPaginationManager,
-};
+// Export all components
+export { default as FilterCheckboxManager } from './filters/filter-checkbox.js';
+export { default as FilterRadioManager } from './filters/filter-radio.js';
+export { default as FilterSelectManager } from './filters/filter-select.js';
+export { default as FilterSelectRangeManager } from './filters/filter-select-range.js';
+export { default as FilterSortManager } from './filters/filter-sort.js';
+export { default as FilterPaginationManager } from './filters/filter-pagination.js';
+export { default as FilterResetManager } from './filters/filter-reset.js';

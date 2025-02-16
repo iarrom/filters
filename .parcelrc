@@ -1,36 +1,13 @@
 {
-  "extends": [
-    "@parcel/config-default"
-  ],
+  "extends": "@parcel/config-default",
   "transformers": {
-    "*.{js,mjs,jsx,cjs,ts,tsx}": [
+    "*.{js,mjs}": [
       "@parcel/transformer-js"
-    ],
-    "*.{css,pcss}": [
-      "@parcel/transformer-css"
-    ],
-    "*.html": [
-      "@parcel/transformer-html"
     ]
   },
   "optimizers": {
-    "*.{js,mjs,cjs}": [
+    "*.js": [
       "@parcel/optimizer-terser"
-    ],
-    "*.css": [
-      "@parcel/optimizer-css"
-    ],
-    "*.html": [
-      "@parcel/optimizer-htmlnano"
-    ]
-  },
-  "packagers": {
-    "*.html": "@parcel/packager-html"
-  },
-  "compressors": {
-    "*.{html,css,js,svg,map}": [
-      "@parcel/compressor-gzip",
-      "@parcel/compressor-brotli"
     ]
   }
 }

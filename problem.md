@@ -1,27 +1,66 @@
-Run npm run lint
+Run npm run clean
 
-> wized-filter-and-pagination@1.0.0 lint
-> eslint .
+> wized-filter-and-pagination@1.0.2 clean
+> rm -rf dist .parcel-cache
 
-/home/runner/work/wized-filter-pagination/wized-filter-pagination/jest.setup.js
-Warning: 18:15 warning '\_callback' is defined but never used no-unused-vars
-Warning: 61:15 warning '\_callback' is defined but never used no-unused-vars
-Warning: 67:11 warning '\_element' is defined but never used no-unused-vars
-Warning: 67:21 warning '\_initObject' is defined but never used no-unused-vars
+> wized-filter-and-pagination@1.0.2 build
+> parcel build src/index.html --dist-dir dist --no-source-maps
 
-/home/runner/work/wized-filter-pagination/wized-filter-pagination/src/**tests**/unit/FilterCheckboxManager.test.js
-Warning: 8:9 warning '\_mockElement' is assigned a value but never used no-unused-vars
+Building...
+🚨 Build failed.
 
-/home/runner/work/wized-filter-pagination/wized-filter-pagination/src/**tests**/unit/FilterRadioManager.test.js
-Warning: 8:9 warning '\_mockElement' is assigned a value but never used no-unused-vars
+@parcel/core: No transformers found for src/index.html with pipeline: 'types'.
 
-/home/runner/work/wized-filter-pagination/wized-filter-pagination/src/filters/filter-checkbox.js
-Warning: 332:20 warning '\_result' is defined but never used no-unused-vars
+/home/runner/work/wized-filter-pagination/wized-filter-pagination/.parcelrc:5:3
+4 | ],
 
-/home/runner/work/wized-filter-pagination/wized-filter-pagination/src/filters/filter-pagination.js
-Warning: 331:20 warning '\_result' is defined but never used no-unused-vars
+> 5 | "transformers": {
+> | ^^^^^^^^^^^^^^^^^
+> 6 | "_.{js,mjs,jsx,cjs,ts,tsx}": [
+> > | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > 7 | "@parcel/transformer-js"
+> > | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > 8 | ],
+> | ^^^^^^
+> 9 | "_.{css,pcss}": [
+> > | ^^^^^^^^^^^^^^^^^^^^^
+> > 10 | "@parcel/transformer-css"
+> > | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > 11 | ],
+> | ^^^^^^
+> 12 | "\*.html": [
+> > | ^^^^^^^^^^^^^^^
+> > 13 | "@parcel/transformer-html"
+> > | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > 14 | ]
+> | ^^^^^
+> 15 | },
+> | ^^^
 
-/home/runner/work/wized-filter-pagination/wized-filter-pagination/src/filters/filter-radio.js
-Warning: 258:20 warning '\_result' is defined but never used no-unused-vars
+/home/runner/work/wized-filter-pagination/wized-filter-pagination/node_modules/@parcel/config-default/index.json:3:3
+2 | "bundler": "@parcel/bundler-default",
 
-✖ 9 problems (0 errors, 9 warnings)
+> 3 | "transformers": {
+> | ^^^^^^^^^^^^^^^^^
+> 4 | "types:_.{ts,tsx}": ["@parcel/transformer-typescript-types"],
+> | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 5 | "bundle-text:_": ["...", "@parcel/transformer-inline-string"],
+> | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 6 | "data-url:_": ["...", "@parcel/transformer-inline-string"],
+> | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 7 | "worklet:_.{js,mjs,jsm,jsx,es6,cjs,ts,tsx}": [
+> > | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > 8 | "@parcel/transformer-worklet",
+> > | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > 9 | "..."
+> > | ^^^^^^^^^^^
+> > 10 | ],
+> | ^^^^^^
+> 11 | "\*.{js,mjs,jsm,jsx,es6,cjs,ts,tsx}": [
+> | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 12 | "@parcel/transformer-babel",
+> | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 13 | "@parcel/transformer-js",
+> | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error: Process completed with exit code 1.

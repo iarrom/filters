@@ -4,22 +4,28 @@
   "description": "Wized filter and pagination functionality",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
+  "source": "src/index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "files": [
     "dist",
     "README.md",
     "LICENSE"
   ],
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aonnoy/wized-filter-pagination.git"
   },
   "author": "Aonnoy Sengupta",
   "scripts": {
-    "start": "parcel src/index.html",
-    "build": "parcel build src/index.html --dist-dir dist --no-source-maps",
-    "build:dev": "parcel build src/index.html --dist-dir dist --no-optimize",
+    "start": "parcel watch",
+    "build": "parcel build",
+    "build:dev": "parcel build --no-optimize",
     "clean": "rm -rf dist .parcel-cache",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
