@@ -66,7 +66,7 @@ export default class FilterRadioManager {
     const filterRequest = radio.getAttribute('w-filter-request');
 
     const chip = window.filterChips.create({
-      label: `${category.toUpperCase()}: ${label}`,
+      label: `${category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}: ${label}`,
       filterType: 'radio',
       category,
       value: label,

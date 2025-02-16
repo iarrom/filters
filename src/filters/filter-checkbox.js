@@ -91,7 +91,7 @@ class FilterCheckboxManager {
     const filterRequest = checkbox.getAttribute('w-filter-request');
 
     const chip = window.filterChips.create({
-      label: `${category.toUpperCase()}: ${label}`,
+      label: `${category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}: ${label}`,
       filterType: 'checkbox',
       category,
       value: label,
