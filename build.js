@@ -15,6 +15,7 @@ async function build() {
       define: {
         'process.env.NODE_ENV': '"production"',
       },
+      pure: ['console.log', 'console.info', 'console.debug'],
     });
 
     console.log('Build completed successfully!');
