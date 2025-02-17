@@ -23,7 +23,6 @@
   },
   "author": "Aonnoy Sengupta",
   "scripts": {
-    "start": "parcel serve src/index.html --port 3001 --open",
     "dev:build": "parcel watch src/index.js --dist-dir dev",
     "dev:serve": "node dev-server.js",
     "dev": "npm-run-all --parallel dev:build dev:serve",

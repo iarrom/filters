@@ -168,6 +168,8 @@ export default class FilterSelectRangeManager {
     const text = this.getSelectedText(select);
     if (!value || !text) return;
 
+    console.log(`Creating chip for ${isFromSelect ? 'FROM' : 'TO'} select with value: ${value}`);
+
     const chipLabel = `${
       category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()
     } ${isFromSelect ? 'FROM' : 'TO'}: ${text}`;
@@ -179,28 +181,91 @@ export default class FilterSelectRangeManager {
 
     // Remove existing chip for this type if it exists
     if (window.filterChips.exists && window.filterChips.exists(chipId, chipValue)) {
+      console.log(`Removing existing chip for ${chipId} with value: ${chipValue}`);
       if (window.filterChips.removeByValue) {
         window.filterChips.removeByValue(chipId, chipValue);
       }
     }
 
+    // Find the corresponding select for proper variable updates
+    const filterWrapper = document.querySelector('[w-filter-wrapper]');
+    const fromSelect = filterWrapper.querySelector(
+      `select[w-filter-select-range-from-variable][w-filter-select-range-category="${category}"]`
+    );
+    const toSelect = filterWrapper.querySelector(
+      `select[w-filter-select-range-to-variable][w-filter-select-range-category="${category}"]`
+    );
+
+    const fromVariable = fromSelect.getAttribute('w-filter-select-range-from-variable');
+    const toVariable = toSelect.getAttribute('w-filter-select-range-to-variable');
+    const paginationVariable = select.getAttribute('w-filter-pagination-current-variable');
+    const filterRequest = select.getAttribute('w-filter-request');
+
     const chip = window.filterChips.create({
       label: chipLabel,
       filterType: 'select',
-      category: chipId, // Use unique category for FROM/TO
+      category: chipId,
       value: chipValue,
       sourceElement: select,
-      onSourceUpdate: () => {
+      onSourceUpdate: async () => {
+        console.log(`Chip removed - onSourceUpdate triggered for ${isFromSelect ? 'FROM' : 'TO'}`);
+        console.log('Current select value:', select.value);
+        console.log('Stored value when chip was created:', currentValue);
+
         // Only reset if the current value is different from when the chip was created
         if (select.value === currentValue) {
+          console.log(`Resetting ${isFromSelect ? 'FROM' : 'TO'} select and updating variables`);
+
+          // Reset only the current select
           select.value = '';
           Array.from(select.options).forEach((option) => (option.disabled = false));
+
+          // Update the corresponding other select's disabled states
+          const otherSelect = isFromSelect ? toSelect : fromSelect;
+          Array.from(otherSelect.options).forEach((option) => (option.disabled = false));
+
+          // Get current values from both selects
+          const currentFromValue = fromSelect.value;
+          const currentToValue = toSelect.value;
+
+          console.log('Current FROM value:', currentFromValue);
+          console.log('Current TO value:', currentToValue);
+
+          // Update only the removed select's variable
+          if (isFromSelect) {
+            this.Wized.data.v[fromVariable] = '';
+            this.Wized.data.v[toVariable] = currentToValue; // Preserve TO value
+          } else {
+            this.Wized.data.v[fromVariable] = currentFromValue; // Preserve FROM value
+            this.Wized.data.v[toVariable] = '';
+          }
+
+          console.log('Updated Wized variables:');
+          console.log('FROM variable:', this.Wized.data.v[fromVariable]);
+          console.log('TO variable:', this.Wized.data.v[toVariable]);
+
+          // Reset pagination and trigger request
+          if (paginationVariable) {
+            console.log('Resetting pagination to 1');
+            this.Wized.data.v[paginationVariable] = 1;
+          }
+
+          if (filterRequest) {
+            console.log('Executing filter request:', filterRequest);
+            try {
+              await this.Wized.requests.execute(filterRequest);
+              console.log('Filter request completed successfully');
+            } catch (error) {
+              console.error('Error executing filter request:', error);
+            }
+          }
         }
       },
     });
 
     // Only try to add chip if it was created successfully
     if (chip && window.filterChips.addToContainer) {
+      console.log(`Adding chip to container for ${isFromSelect ? 'FROM' : 'TO'}`);
       window.filterChips.addToContainer(chip);
     }
   }
