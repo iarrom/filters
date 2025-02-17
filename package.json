@@ -1,6 +1,6 @@
 {
   "name": "wized-filter-and-pagination",
-  "version": "1.0.10-staging.20250216190310-staging.20250216190750-staging.20250217011420",
+  "version": "1.0.11",
   "description": "Wized filter and pagination functionality",
   "main": "dist/index.min.js",
   "module": "dist/index.esm.js",
