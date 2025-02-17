@@ -1,6 +1,6 @@
 {
   "name": "wized-filter-and-pagination",
-  "version": "1.0.11",
+  "version": "1.0.11-staging.20250217015133",
   "description": "Wized filter and pagination functionality",
   "main": "dist/index.min.js",
   "module": "dist/index.esm.js",
@@ -23,7 +23,6 @@
   },
   "author": "Aonnoy Sengupta",
   "scripts": {
-    "start": "parcel serve src/index.html --port 3001 --open",
     "dev:build": "parcel watch src/index.js --dist-dir dev",
     "dev:serve": "node dev-server.js",
     "dev": "npm-run-all --parallel dev:build dev:serve",
