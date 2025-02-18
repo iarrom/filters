@@ -166,6 +166,12 @@ export default class FilterResetManager {
         console.log('Sort inputs reset complete');
       }
 
+      if (typeof window.resetAllSearchInputs === 'function') {
+        console.log('Found search reset function');
+        await window.resetAllSearchInputs();
+        console.log('Search inputs reset complete');
+      }
+
       // Reset pagination to 1
       const paginationVariable = resetButton.getAttribute('w-filter-pagination-current-variable');
       if (paginationVariable) {

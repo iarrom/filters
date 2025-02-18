@@ -9,25 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Initial release of Wized Filter and Pagination
-- Advanced filtering functionality:
-  - Checkbox-based filtering
-  - Radio button filtering
-  - Select dropdown filtering
-  - Range-based filtering
-  - Filter chips for visual feedback
-  - Reset functionality
-- Smart pagination system:
-  - Infinite scroll support
-  - Dynamic page loading
-  - Automatic state management
-- Performance optimizations:
-  - Efficient DOM manipulation
-  - Debounced filter updates
-  - Optimized state management
-- Comprehensive documentation and examples
-- Full test coverage
-- ESLint and Prettier configuration
-- Continuous Integration setup
+- Added search filter
+- Modified reset filter
+- Removed filter-main.js
+- Create a jest test on filter-search.js
 
 [1.0.0]: https://github.com/aonnoy/wized-filter-pagination/releases/tag/v1.0.0

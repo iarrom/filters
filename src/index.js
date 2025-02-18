@@ -6,6 +6,7 @@ import FilterChipsManager from './filters/filter-chips.js';
 import FilterSortManager from './filters/filter-sort.js';
 import FilterPaginationManager from './filters/filter-pagination.js';
 import FilterResetManager from './filters/filter-reset.js';
+import FilterSearchManager from './filters/filter-search.js';
 
 // Export all components
 export { FilterCheckboxManager };
@@ -16,6 +17,7 @@ export { FilterChipsManager };
 export { FilterSortManager };
 export { FilterPaginationManager };
 export { FilterResetManager };
+export { FilterSearchManager };
 
 // Initialize components when loaded in browser
 if (typeof window !== 'undefined') {
@@ -31,6 +33,7 @@ if (typeof window !== 'undefined') {
     new FilterSelectRangeManager(Wized);
     new FilterSortManager(Wized);
     new FilterPaginationManager(Wized);
+    new FilterSearchManager(Wized);
 
     // Initialize reset manager last since it depends on other managers being ready
     new FilterResetManager(Wized);
