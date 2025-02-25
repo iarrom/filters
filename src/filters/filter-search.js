@@ -91,6 +91,7 @@ class FilterSearchManager {
     const value = forceEmpty ? '' : searchInput.value.trim();
     console.log('=== Updating Search Variables ===');
     console.log('Search value:', value);
+    console.log('Global reset in progress:', window.isGlobalResetInProgress);
 
     // Update Wized variable
     this.Wized.data.v[variableName] = value;
@@ -102,8 +103,8 @@ class FilterSearchManager {
       console.log(`Reset pagination variable ${paginationVariable} to: 1`);
     }
 
-    // Execute filter request if provided and not skipped
-    if (filterRequest && !skipRequest) {
+    // Execute filter request if provided and not skipped and not during global reset
+    if (filterRequest && !skipRequest && !window.isGlobalResetInProgress) {
       console.log(`Executing filter request: ${filterRequest}`);
       try {
         await this.Wized.requests.execute(filterRequest);
@@ -111,8 +112,12 @@ class FilterSearchManager {
       } catch (error) {
         console.error(`Error executing filter request:`, error);
       }
-    } else if (skipRequest) {
-      console.log('Skipping request execution during reset');
+    } else {
+      console.log('Skipping request execution:', {
+        hasFilterRequest: !!filterRequest,
+        skipRequest,
+        isGlobalReset: window.isGlobalResetInProgress,
+      });
     }
     console.log('=== Search Update Complete ===');
   }

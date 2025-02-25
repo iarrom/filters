@@ -10,12 +10,14 @@
  */
 class FilterCheckboxManager {
   constructor(Wized) {
+    console.log('[FilterCheckboxManager] Initializing...');
     this.Wized = Wized;
 
     // Internal state
     this.state = {
       monitoredGroups: new Set(), // Tracks which checkbox groups are being monitored
       checkboxGroups: null, // Stores organized checkbox group data
+      hasChipsSupport: false, // Track if chips functionality is available
     };
 
     // Bind methods
@@ -261,6 +263,12 @@ class FilterCheckboxManager {
    * Handles checkbox click events
    */
   handleCheckboxClick(checkbox, elements, variableName, paginationVariable, filterRequest) {
+    console.log('[FilterCheckboxManager] Handling checkbox click:', {
+      variableName,
+      paginationVariable,
+      filterRequest,
+    });
+
     setTimeout(() => {
       const category = checkbox.getAttribute('w-filter-checkbox-category');
       const label = this.getCheckboxLabel(checkbox);
@@ -268,21 +276,50 @@ class FilterCheckboxManager {
         '.w-checkbox-input--inputType-custom.w--redirected-checked'
       );
 
-      if (window.filterChips && window.filterChipsReady) {
-        if (isChecked) {
-          if (!window.filterChips.exists || !window.filterChips.exists(category, label)) {
-            this.createCheckboxChip(checkbox, category);
-          }
-        } else if (window.filterChips.removeByValue) {
-          window.filterChips.removeByValue(category, label);
-        }
-      }
+      console.log('[FilterCheckboxManager] Checkbox state:', {
+        category,
+        label,
+        isChecked: !!isChecked,
+      });
 
-      this.updateWizedVariable(elements, variableName, paginationVariable, filterRequest);
+      // First handle the core checkbox functionality
+      this.updateWizedVariable(elements, variableName, paginationVariable, filterRequest)
+        .then(() => {
+          console.log('[FilterCheckboxManager] Successfully updated Wized variable');
+        })
+        .catch((error) => {
+          console.error('[FilterCheckboxManager] Error updating Wized variable:', error);
+        });
+
+      // Then handle chips if available
+      if (window.filterChips && window.filterChipsReady) {
+        console.log('[FilterCheckboxManager] Chips functionality detected, updating chips...');
+        try {
+          if (isChecked) {
+            if (!window.filterChips.exists || !window.filterChips.exists(category, label)) {
+              this.createCheckboxChip(checkbox, category);
+            }
+          } else if (window.filterChips.removeByValue) {
+            window.filterChips.removeByValue(category, label);
+          }
+        } catch (error) {
+          console.error('[FilterCheckboxManager] Error handling chips:', error);
+          // Continue checkbox functionality even if chips fail
+        }
+      } else {
+        console.log(
+          '[FilterCheckboxManager] Chips functionality not available, continuing with core checkbox functionality only'
+        );
+      }
     }, 50);
   }
 
   setupGroupEventHandlers(group) {
+    console.log('[FilterCheckboxManager] Setting up group event handlers:', {
+      wizedName: group.wizedName,
+      variableName: group.variableName,
+    });
+
     const {
       wizedName,
       requestName,
@@ -299,6 +336,7 @@ class FilterCheckboxManager {
       this.state.monitoredGroups.add(groupKey);
 
       if (!this.Wized.data.v[variableName]) {
+        console.log('[FilterCheckboxManager] Initializing Wized variable:', variableName);
         this.Wized.data.v[variableName] = [];
       }
 
@@ -317,9 +355,13 @@ class FilterCheckboxManager {
       });
 
       if (!isStatic && requestName) {
+        console.log(
+          '[FilterCheckboxManager] Setting up dynamic filter request monitoring:',
+          requestName
+        );
         this.Wized.on('requestend', (filterResult) => {
           if (filterResult.id === requestName || filterResult.name === requestName) {
-            // Dynamic filter request completed
+            console.log('[FilterCheckboxManager] Dynamic filter request completed:', filterResult);
           }
         });
       }
@@ -347,16 +389,30 @@ class FilterCheckboxManager {
    * Unchecks all filter checkboxes and resets their variables
    */
   async uncheckAllFilterCheckboxes() {
+    console.log('[FilterCheckboxManager] Unchecking all filter checkboxes...');
+
     const filterWrapper = document.querySelector('[w-filter-wrapper]');
-    if (!filterWrapper) return;
+    if (!filterWrapper) {
+      console.log('[FilterCheckboxManager] No filter wrapper found');
+      return;
+    }
 
     const checkboxes = filterWrapper.querySelectorAll('label[wized][w-filter-checkbox-variable]');
 
-    if (checkboxes.length === 0) return;
+    if (checkboxes.length === 0) {
+      console.log('[FilterCheckboxManager] No checkboxes found');
+      return;
+    }
 
     // Clear all chips if chips manager is available and initialized
     if (window.filterChips && window.filterChipsReady && window.filterChips.clearAll) {
-      window.filterChips.clearAll();
+      console.log('[FilterCheckboxManager] Clearing all chips');
+      try {
+        window.filterChips.clearAll();
+      } catch (error) {
+        console.error('[FilterCheckboxManager] Error clearing chips:', error);
+        // Continue with checkbox reset even if chips fail
+      }
     }
 
     const groupedByVariable = Array.from(checkboxes).reduce((groups, checkbox) => {
@@ -369,11 +425,22 @@ class FilterCheckboxManager {
     }, {});
 
     for (const [variableName, checkboxGroup] of Object.entries(groupedByVariable)) {
+      console.log('[FilterCheckboxManager] Resetting checkbox group:', variableName);
+
       checkboxGroup.forEach((checkbox) => {
         this.updateCheckboxVisualState(checkbox, false);
       });
 
-      this.Wized.data.v[variableName] = [];
+      try {
+        this.Wized.data.v[variableName] = [];
+        console.log('[FilterCheckboxManager] Successfully reset Wized variable:', variableName);
+      } catch (error) {
+        console.error(
+          '[FilterCheckboxManager] Error resetting Wized variable:',
+          variableName,
+          error
+        );
+      }
     }
   }
 }

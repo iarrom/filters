@@ -12,6 +12,7 @@
  */
 class FilterChipsManager {
   constructor(Wized) {
+    console.log('[FilterChipsManager] Initializing...');
     this.Wized = Wized;
 
     // Internal state
@@ -24,6 +25,7 @@ class FilterChipsManager {
       singleSelectionCategories: new Set(['radio', 'select']),
       // Track chips by their source type
       chipsByType: new Map(),
+      isEnabled: false, // Track if chips functionality is enabled
     };
 
     // Initialize the manager
@@ -39,54 +41,73 @@ class FilterChipsManager {
    */
   initialize() {
     // Set up template and container
-    this.setupTemplate();
-    this.setupContainer();
+    const hasTemplate = this.setupTemplate();
+    const hasContainer = this.setupContainer();
 
-    // Initialize chip type tracking
-    this.state.chipsByType.set('checkbox', new Set());
-    this.state.chipsByType.set('radio', new Set());
-    this.state.chipsByType.set('select', new Set());
+    // Only enable chips if both template and container are present
+    this.state.isEnabled = hasTemplate && hasContainer;
+    console.log(
+      '[FilterChipsManager] Initialization complete. Chips enabled:',
+      this.state.isEnabled
+    );
 
-    // Make public API available globally
-    this.exposePublicAPI();
+    if (this.state.isEnabled) {
+      // Initialize chip type tracking
+      this.state.chipsByType.set('checkbox', new Set());
+      this.state.chipsByType.set('radio', new Set());
+      this.state.chipsByType.set('select', new Set());
+
+      // Make public API available globally
+      this.exposePublicAPI();
+    } else {
+      console.log(
+        '[FilterChipsManager] Chips functionality disabled due to missing template or container'
+      );
+    }
   }
 
   /**
    * Sets up the chip template element
    */
   setupTemplate() {
-    if (this.state.chipTemplate) return this.state.chipTemplate;
+    console.log('[FilterChipsManager] Setting up template...');
+    if (this.state.chipTemplate) return true;
 
     const template = document.querySelector('div[w-filter-chip="chip"]');
     if (!template) {
-      // Template is optional, so just return null without error
-      return null;
+      console.log('[FilterChipsManager] No chip template found');
+      return false;
     }
 
     // Hide the template element
     template.style.display = 'none';
-
     this.state.chipTemplate = template;
-    return template;
+    console.log('[FilterChipsManager] Template setup successful');
+    return true;
   }
 
   /**
    * Sets up the chip container element
    */
   setupContainer() {
-    if (this.state.chipContainer) return this.state.chipContainer;
+    console.log('[FilterChipsManager] Setting up container...');
+    if (this.state.chipContainer) return true;
 
     const template = this.state.chipTemplate;
-    if (!template) return null;
+    if (!template) {
+      console.log('[FilterChipsManager] No template available for container setup');
+      return false;
+    }
 
     const container = template.parentElement;
     if (!container) {
-      // Container is only needed if template exists
-      return null;
+      console.log('[FilterChipsManager] No container found');
+      return false;
     }
 
     this.state.chipContainer = container;
-    return container;
+    console.log('[FilterChipsManager] Container setup successful');
+    return true;
   }
 
   // =============================================
@@ -177,12 +198,23 @@ class FilterChipsManager {
    * Creates a new filter chip
    */
   createFilterChip({ label, filterType, category, value, sourceElement, onSourceUpdate }) {
+    if (!this.state.isEnabled) {
+      console.log('[FilterChipsManager] Chips disabled, skipping chip creation');
+      // Still execute the source update callback if provided
+      if (onSourceUpdate) {
+        onSourceUpdate();
+      }
+      return null;
+    }
+
     try {
       // Validate required parameters
       if (!label || !category || !value) {
-        console.error('Missing required parameters for chip creation');
+        console.error('[FilterChipsManager] Missing required parameters for chip creation');
         return null;
       }
+
+      console.log('[FilterChipsManager] Creating chip:', { label, filterType, category, value });
 
       // Check if template exists - chips are optional
       const template = this.state.chipTemplate;
@@ -255,7 +287,7 @@ class FilterChipsManager {
 
       return chip;
     } catch (error) {
-      console.error('Error creating filter chip:', error);
+      console.error('[FilterChipsManager] Error creating filter chip:', error);
       return null;
     }
   }
@@ -351,6 +383,12 @@ class FilterChipsManager {
    * Exposes the public API for external use
    */
   exposePublicAPI() {
+    if (!this.state.isEnabled) {
+      console.log('[FilterChipsManager] Chips disabled, skipping API exposure');
+      return;
+    }
+
+    console.log('[FilterChipsManager] Exposing public API');
     window.filterChips = {
       create: this.createFilterChip.bind(this),
       addToContainer: this.addChipToContainer.bind(this),
@@ -363,6 +401,7 @@ class FilterChipsManager {
 
     // Signal that chips system is ready
     window.filterChipsReady = true;
+    console.log('[FilterChipsManager] Public API exposed successfully');
   }
 }
 

@@ -19,6 +19,11 @@ export default class FilterResetManager {
       mainResetButton: null,
     };
 
+    // Expose global reset state
+    if (typeof window !== 'undefined') {
+      window.isGlobalResetInProgress = false;
+    }
+
     // Bind methods
     this.setupMainResetButton = this.setupMainResetButton.bind(this);
     this.checkForActiveFilters = this.checkForActiveFilters.bind(this);
@@ -130,47 +135,61 @@ export default class FilterResetManager {
    * @param {HTMLElement} resetButton - The reset button element
    */
   async resetAllFilters(resetButton) {
-    if (this.state.processingReset) return;
+    console.log('=== Reset Request Started ===');
+    console.log('Processing Reset State:', this.state.processingReset);
+
+    if (this.state.processingReset) {
+      console.log('Reset already in progress, skipping...');
+      return;
+    }
+
     this.state.processingReset = true;
+    window.isGlobalResetInProgress = true;
+    console.log('Set processingReset flag to:', this.state.processingReset);
+    console.log('Set global reset flag to:', window.isGlobalResetInProgress);
 
     console.log('=== Starting Filter Reset ===');
     try {
-      // Reset all filter types
+      const resetPromises = [];
+      console.log('Initializing reset promises array');
+
+      // Collect all reset operations
       if (typeof window.uncheckAllFilterCheckboxes === 'function') {
-        console.log('Found checkbox reset function');
-        await window.uncheckAllFilterCheckboxes();
-        console.log('Checkboxes reset complete');
+        console.log('Adding checkbox reset to queue');
+        resetPromises.push(window.uncheckAllFilterCheckboxes());
       }
 
       if (typeof window.uncheckAllRadioButtons === 'function') {
-        console.log('Found radio reset function');
-        await window.uncheckAllRadioButtons();
-        console.log('Radio buttons reset complete');
+        console.log('Adding radio reset to queue');
+        resetPromises.push(window.uncheckAllRadioButtons());
       }
 
       if (typeof window.resetAllSelectInputs === 'function') {
-        console.log('Found select reset function');
-        await window.resetAllSelectInputs();
-        console.log('Select inputs reset complete');
+        console.log('Adding select reset to queue');
+        resetPromises.push(window.resetAllSelectInputs());
       }
 
       if (typeof window.resetAllRangeSelects === 'function') {
-        console.log('Found range reset function');
-        await window.resetAllRangeSelects();
-        console.log('Range selects reset complete');
+        console.log('Adding range reset to queue');
+        resetPromises.push(window.resetAllRangeSelects());
       }
 
       if (typeof window.resetAllSortInputs === 'function') {
-        console.log('Found sort reset function');
-        await window.resetAllSortInputs();
-        console.log('Sort inputs reset complete');
+        console.log('Adding sort reset to queue');
+        resetPromises.push(window.resetAllSortInputs());
       }
 
       if (typeof window.resetAllSearchInputs === 'function') {
-        console.log('Found search reset function');
-        await window.resetAllSearchInputs();
-        console.log('Search inputs reset complete');
+        console.log('Adding search reset to queue');
+        resetPromises.push(window.resetAllSearchInputs());
       }
+
+      console.log(`Total reset operations queued: ${resetPromises.length}`);
+
+      // Wait for all reset operations to complete
+      console.log('Executing all reset operations...');
+      await Promise.all(resetPromises);
+      console.log('All reset operations completed successfully');
 
       // Reset pagination to 1
       const paginationVariable = resetButton.getAttribute('w-filter-pagination-current-variable');
@@ -179,21 +198,28 @@ export default class FilterResetManager {
         this.Wized.data.v[paginationVariable] = 1;
       }
 
-      // Execute filter request to update results
+      // Execute filter request once to update results
       const filterRequest = resetButton.getAttribute('w-filter-request');
       if (filterRequest) {
-        console.log(`Preparing to execute filter request: ${filterRequest}`);
+        console.log(`[REQUEST-START] Executing filter request: ${filterRequest}`);
+        console.log('Current processingReset state:', this.state.processingReset);
+
         try {
           await this.Wized.requests.execute(filterRequest);
-          console.log('Filter request executed successfully');
+          console.log('[REQUEST-END] Filter request executed successfully');
         } catch (error) {
-          console.error(`Error executing filter request: ${error}`);
+          console.error('[REQUEST-ERROR] Error executing filter request:', error);
         }
+      } else {
+        console.log('No filter request attribute found on reset button');
       }
     } catch (error) {
       console.error('Error in resetAllFilters:', error);
     } finally {
       this.state.processingReset = false;
+      window.isGlobalResetInProgress = false;
+      console.log('Reset processingReset flag to:', this.state.processingReset);
+      console.log('Reset global reset flag to:', window.isGlobalResetInProgress);
     }
     console.log('=== Filter Reset Complete ===');
   }
@@ -219,7 +245,8 @@ export default class FilterResetManager {
 
     resetButton.addEventListener('click', async (e) => {
       e.preventDefault();
-      console.log('=== Reset Button Clicked ===');
+      console.log('=== Reset Button Click Event Started ===');
+      console.log('Event timestamp:', new Date().toISOString());
 
       // Check if any filters are active
       console.log('Checking for active filters...');
@@ -232,7 +259,7 @@ export default class FilterResetManager {
       } else {
         console.log('No active filters found, skipping reset');
       }
-      console.log('=== Reset Button Click Handled ===');
+      console.log('=== Reset Button Click Event Completed ===');
     });
     console.log('Reset button setup complete');
   }
