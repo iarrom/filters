@@ -65,10 +65,14 @@ class FilterCheckboxManager {
   updateCheckboxVisualState(checkbox, checked) {
     const customCheckbox = checkbox.querySelector('.w-checkbox-input--inputType-custom');
     if (customCheckbox) {
-      if (checked) {
-        customCheckbox.classList.add('w--redirected-checked');
-      } else {
-        customCheckbox.classList.remove('w--redirected-checked');
+      try {
+        if (checked) {
+          customCheckbox.classList.add('w--redirected-checked');
+        } else {
+          customCheckbox.classList.remove('w--redirected-checked');
+        }
+      } catch (error) {
+        console.error('Error updating checkbox visual state:', error);
       }
     }
   }

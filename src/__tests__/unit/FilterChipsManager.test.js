@@ -264,7 +264,9 @@ describe('FilterChipsManager', () => {
       const chip = manager.createFilterChip({});
 
       expect(chip).toBeNull();
-      expect(consoleSpy).toHaveBeenCalledWith('Missing required parameters for chip creation');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[FilterChipsManager] Missing required parameters for chip creation'
+      );
     });
 
     test('should handle chip removal with missing attributes', () => {

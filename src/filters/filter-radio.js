@@ -46,10 +46,14 @@ export default class FilterRadioManager {
   updateRadioVisualState(radio, checked) {
     const customRadio = radio.querySelector('.w-form-formradioinput--inputType-custom');
     if (customRadio) {
-      if (checked) {
-        customRadio.classList.add('w--redirected-checked');
-      } else {
-        customRadio.classList.remove('w--redirected-checked');
+      try {
+        if (checked) {
+          customRadio.classList.add('w--redirected-checked');
+        } else {
+          customRadio.classList.remove('w--redirected-checked');
+        }
+      } catch (error) {
+        console.error('Error updating radio visual state:', error);
       }
     }
   }
@@ -241,10 +245,12 @@ export default class FilterRadioManager {
 
     setTimeout(() => {
       const category = radio.getAttribute('w-filter-radio-category');
+      const customRadio = radio.querySelector('.w-form-formradioinput--inputType-custom');
+      const wasChecked = customRadio && customRadio.classList.contains('w--redirected-checked');
 
       // First handle the core radio functionality
       elements.forEach((otherRadio) => {
-        this.updateRadioVisualState(otherRadio, otherRadio === radio);
+        this.updateRadioVisualState(otherRadio, otherRadio === radio && !wasChecked);
       });
 
       // Update Wized variable
@@ -255,8 +261,11 @@ export default class FilterRadioManager {
           // Then try to handle chips if available
           if (window.filterChips && window.filterChipsReady) {
             try {
-              window.filterChips.clearCategory(category);
-              this.createRadioChip(radio, category);
+              if (wasChecked) {
+                window.filterChips.clearCategory(category);
+              } else {
+                this.createRadioChip(radio, category);
+              }
             } catch (error) {
               console.error('[FilterRadioManager] Error handling chips:', error);
               // Continue radio functionality even if chips fail
