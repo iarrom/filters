@@ -21,6 +21,7 @@
     "type": "git",
     "url": "git+https://github.com/aonnoy/wized-filter-pagination.git"
   },
+  "homepage": "https://filters-with-pagination-tutorial.webflow.io/",
   "author": "Aonnoy Sengupta",
   "scripts": {
     "dev:build": "parcel watch src/index.js --dist-dir dev",
