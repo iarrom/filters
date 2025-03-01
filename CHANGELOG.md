@@ -5,10 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.18] - 2025-02-25
+## [1.0.19] - 2025-03-01
 
 ### Added
 
-- updating readme and fixing jest tests
+- There was an issue when changing radio selection, which is now fixed.
 
-[1.0.18]: https://github.com/aonnoy/wized-filter-pagination/releases/tag/v1.0.18
+[1.0.19]: https://github.com/aonnoy/wized-filter-pagination/releases/tag/v1.0.19
