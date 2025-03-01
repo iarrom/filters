@@ -11,6 +11,7 @@ export default class FilterRadioManager {
       monitoredGroups: new Set(), // Tracks which radio groups are being monitored
       radioGroups: null, // Stores organized radio group data
       hasChipsSupport: false, // Track if chips functionality is available
+      isProcessing: false, // Flag to prevent recursive updates
     };
 
     // Bind methods
@@ -44,17 +45,29 @@ export default class FilterRadioManager {
   }
 
   updateRadioVisualState(radio, checked) {
+    console.log('[FilterRadioManager] Updating radio visual state:', {
+      label: this.getRadioLabel(radio),
+      checked,
+    });
+
     const customRadio = radio.querySelector('.w-form-formradioinput--inputType-custom');
     if (customRadio) {
       try {
+        const beforeClasses = customRadio.classList.toString();
         if (checked) {
           customRadio.classList.add('w--redirected-checked');
         } else {
           customRadio.classList.remove('w--redirected-checked');
         }
+        console.log('Radio classes updated:', {
+          before: beforeClasses,
+          after: customRadio.classList.toString(),
+        });
       } catch (error) {
         console.error('Error updating radio visual state:', error);
       }
+    } else {
+      console.warn('Custom radio element not found');
     }
   }
 
@@ -84,17 +97,31 @@ export default class FilterRadioManager {
         value: label,
         sourceElement: radio,
         onSourceUpdate: async () => {
-          const group = document.querySelectorAll(`[w-filter-radio-variable="${variableName}"]`);
-          group.forEach((groupRadio) => {
-            this.updateRadioVisualState(groupRadio, false);
-          });
-          await this.updateWizedVariable(
-            Array.from(group),
-            variableName,
-            paginationVariable,
-            filterRequest,
-            true
-          );
+          // Skip if we're already processing a radio click
+          if (this.state.isProcessing) {
+            console.log(
+              '[FilterRadioManager] Skipping chip onSourceUpdate due to active processing'
+            );
+            return;
+          }
+
+          this.state.isProcessing = true;
+          try {
+            const group = document.querySelectorAll(`[w-filter-radio-variable="${variableName}"]`);
+            group.forEach((groupRadio) => {
+              this.updateRadioVisualState(groupRadio, false);
+            });
+
+            await this.updateWizedVariable(
+              Array.from(group),
+              variableName,
+              paginationVariable,
+              filterRequest,
+              true
+            );
+          } finally {
+            this.state.isProcessing = false;
+          }
         },
       });
 
@@ -103,7 +130,6 @@ export default class FilterRadioManager {
       }
     } catch (error) {
       console.error('[FilterRadioManager] Error creating chip:', error);
-      // Continue radio functionality even if chip creation fails
     }
   }
 
@@ -118,10 +144,13 @@ export default class FilterRadioManager {
     filterRequest,
     forceEmpty = false
   ) {
-    console.log('[FilterRadioManager] Updating Wized variable:', {
+    console.group('[FilterRadioManager] Updating Wized variable');
+    console.log('Update parameters:', {
       variableName,
       paginationVariable,
+      filterRequest,
       forceEmpty,
+      numberOfRadios: radios.length,
     });
 
     try {
@@ -132,22 +161,31 @@ export default class FilterRadioManager {
           );
 
       const value = selectedValue ? this.getRadioLabel(selectedValue) : '';
+      console.log('Selected value:', {
+        hasSelectedValue: !!selectedValue,
+        value,
+        previousValue: this.Wized.data.v[variableName],
+      });
+
       this.Wized.data.v[variableName] = value;
 
       if (paginationVariable) {
+        console.log('Resetting pagination to 1');
         this.Wized.data.v[paginationVariable] = 1;
       }
 
       if (filterRequest) {
+        console.log('Executing filter request:', filterRequest);
         await this.Wized.requests.execute(filterRequest);
+        console.log('Filter request completed');
       }
 
-      console.log('[FilterRadioManager] Successfully updated Wized variable:', {
-        variableName,
-        value,
-      });
+      console.log('Wized variable update successful');
     } catch (error) {
-      console.error('[FilterRadioManager] Error updating Wized variable:', error);
+      console.error('Error updating Wized variable:', error);
+      throw error;
+    } finally {
+      console.groupEnd();
     }
   }
 
@@ -237,45 +275,81 @@ export default class FilterRadioManager {
   // =============================================
 
   handleRadioClick(radio, elements, variableName, paginationVariable, filterRequest) {
-    console.log('[FilterRadioManager] Handling radio click:', {
-      variableName,
-      paginationVariable,
-      filterRequest,
-    });
+    // Skip if we're already processing
+    if (this.state.isProcessing) {
+      console.log('[FilterRadioManager] Skipping radio click due to active processing');
+      return;
+    }
 
-    setTimeout(() => {
+    this.state.isProcessing = true;
+    console.group('[FilterRadioManager] Radio Click Event');
+
+    try {
       const category = radio.getAttribute('w-filter-radio-category');
       const customRadio = radio.querySelector('.w-form-formradioinput--inputType-custom');
       const wasChecked = customRadio && customRadio.classList.contains('w--redirected-checked');
 
-      // First handle the core radio functionality
-      elements.forEach((otherRadio) => {
-        this.updateRadioVisualState(otherRadio, otherRadio === radio && !wasChecked);
+      console.log('Radio state before update:', {
+        category,
+        wasChecked,
+        customRadioClasses: customRadio
+          ? customRadio.classList.toString()
+          : 'no custom radio found',
       });
 
-      // Update Wized variable
-      this.updateWizedVariable(elements, variableName, paginationVariable, filterRequest)
-        .then(() => {
-          console.log('[FilterRadioManager] Successfully handled radio click');
+      // Handle the core radio functionality
+      elements.forEach((otherRadio) => {
+        const shouldBeChecked = otherRadio === radio && !wasChecked;
+        this.updateRadioVisualState(otherRadio, shouldBeChecked);
+      });
 
-          // Then try to handle chips if available
+      // If it was already checked, we're unchecking it
+      if (wasChecked) {
+        console.log('Radio was checked, unchecking and clearing chips');
+        if (window.filterChips && window.filterChipsReady) {
+          window.filterChips.clearCategory(category);
+        }
+        return this.updateWizedVariable(
+          elements,
+          variableName,
+          paginationVariable,
+          filterRequest,
+          true
+        ).finally(() => {
+          this.state.isProcessing = false;
+          console.groupEnd();
+        });
+      }
+
+      // Update Wized variable first
+      return this.updateWizedVariable(elements, variableName, paginationVariable, filterRequest)
+        .then(() => {
+          // Then handle chips if available
           if (window.filterChips && window.filterChipsReady) {
             try {
-              if (wasChecked) {
-                window.filterChips.clearCategory(category);
-              } else {
-                this.createRadioChip(radio, category);
-              }
+              window.filterChips.clearCategory(category);
+              this.createRadioChip(radio, category);
             } catch (error) {
-              console.error('[FilterRadioManager] Error handling chips:', error);
-              // Continue radio functionality even if chips fail
+              console.error('Error handling chips:', error);
             }
           }
         })
         .catch((error) => {
-          console.error('[FilterRadioManager] Error handling radio click:', error);
+          console.error('Error in radio click handler:', error);
+          elements.forEach((otherRadio) => {
+            const shouldRevert = otherRadio === radio && wasChecked;
+            this.updateRadioVisualState(otherRadio, shouldRevert);
+          });
+        })
+        .finally(() => {
+          this.state.isProcessing = false;
+          console.groupEnd();
         });
-    }, 50);
+    } catch (error) {
+      console.error('Unexpected error in radio click handler:', error);
+      this.state.isProcessing = false;
+      console.groupEnd();
+    }
   }
 
   setupGroupEventHandlers(group) {
