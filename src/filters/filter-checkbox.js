@@ -8,6 +8,7 @@
  * 4. Wized Integration: Coordinates with Wized for data and requests
  * 5. Chips Integration: Coordinates with FilterChipsManager for visual feedback
  */
+import { setParam } from '../utils/url-sync.js';
 class FilterCheckboxManager {
   constructor(Wized) {
     console.log('[FilterCheckboxManager] Initializing...');
@@ -19,6 +20,9 @@ class FilterCheckboxManager {
       checkboxGroups: null, // Stores organized checkbox group data
       hasChipsSupport: false, // Track if chips functionality is available
     };
+
+    // Map query parameter name -> Wized variable
+    this.paramMap = {};
 
     // Bind methods
     this.setupFilterMonitoring = this.setupFilterMonitoring.bind(this);
@@ -152,6 +156,13 @@ class FilterCheckboxManager {
           .map(this.getCheckboxLabel);
 
     this.Wized.data.v[variableName] = checkedValues;
+
+    const paramName = Object.keys(this.paramMap).find(
+      (key) => this.paramMap[key] === variableName
+    );
+    if (paramName) {
+      setParam(paramName, checkedValues);
+    }
 
     const shouldTriggerUpdates =
       isReset || checkedValues.length > 0 || (!forceEmpty && checkedValues.length === 0);
@@ -344,7 +355,20 @@ class FilterCheckboxManager {
         this.Wized.data.v[variableName] = [];
       }
 
+      if (wizedName) {
+        this.paramMap[wizedName] = variableName;
+      }
+
       this.setupResetButton(group);
+
+      const currentValues = this.Wized.data.v[variableName];
+      if (Array.isArray(currentValues) && currentValues.length > 0) {
+        elements.forEach((checkbox) => {
+          const label = this.getCheckboxLabel(checkbox);
+          const shouldCheck = currentValues.includes(label);
+          this.updateCheckboxVisualState(checkbox, shouldCheck);
+        });
+      }
 
       elements.forEach((checkbox) => {
         checkbox.addEventListener('click', () => {
@@ -437,6 +461,12 @@ class FilterCheckboxManager {
 
       try {
         this.Wized.data.v[variableName] = [];
+        const paramName = Object.keys(this.paramMap).find(
+          (key) => this.paramMap[key] === variableName
+        );
+        if (paramName) {
+          setParam(paramName, []);
+        }
         console.log('[FilterCheckboxManager] Successfully reset Wized variable:', variableName);
       } catch (error) {
         console.error(
