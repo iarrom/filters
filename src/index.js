@@ -7,6 +7,7 @@ import FilterSortManager from './filters/filter-sort.js';
 import FilterPaginationManager from './filters/filter-pagination.js';
 import FilterResetManager from './filters/filter-reset.js';
 import FilterSearchManager from './filters/filter-search.js';
+import { applyParamsToWized } from './utils/url-sync.js';
 
 // Export all components
 export { FilterCheckboxManager };
@@ -23,6 +24,38 @@ export { FilterSearchManager };
 if (typeof window !== 'undefined') {
   window.Wized = window.Wized || [];
   window.Wized.push((Wized) => {
+    const buildMapping = () => {
+      const mapping = {};
+      document.querySelectorAll('[wized][w-filter-checkbox-variable]').forEach((el) => {
+        mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-checkbox-variable');
+      });
+      document.querySelectorAll('[wized][w-filter-radio-variable]').forEach((el) => {
+        mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-radio-variable');
+      });
+      document.querySelectorAll('[wized][w-filter-select-variable]').forEach((el) => {
+        mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-select-variable');
+      });
+      document
+        .querySelectorAll('[wized][w-filter-select-range-from-variable]')
+        .forEach((el) => {
+          mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-select-range-from-variable');
+        });
+      document
+        .querySelectorAll('[wized][w-filter-select-range-to-variable]')
+        .forEach((el) => {
+          mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-select-range-to-variable');
+        });
+      document.querySelectorAll('[wized][w-filter-sort-variable]').forEach((el) => {
+        mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-sort-variable');
+      });
+      document.querySelectorAll('[wized][w-filter-search-variable]').forEach((el) => {
+        mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-search-variable');
+      });
+      return mapping;
+    };
+
+    applyParamsToWized(Wized, buildMapping());
+
     // Initialize chips manager first since other managers depend on it
     new FilterChipsManager(Wized);
 

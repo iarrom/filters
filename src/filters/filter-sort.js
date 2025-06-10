@@ -7,6 +7,7 @@
  * 3. Event Handling: Manages change events and request completions
  * 4. Wized Integration: Coordinates with Wized for data and requests
  */
+import { setParam } from '../utils/url-sync.js';
 export default class FilterSortManager {
   constructor(Wized) {
     // console.log("FilterSortManager: Initializing...");
@@ -19,6 +20,8 @@ export default class FilterSortManager {
       processingChange: false, // Prevent multiple simultaneous changes
       dynamicSorts: new Map(), // Track selects with dynamic options
     };
+
+    this.paramMap = {};
 
     // Bind methods
     this.setupFilterMonitoring = this.setupFilterMonitoring.bind(this);
@@ -149,6 +152,13 @@ export default class FilterSortManager {
 
     // Update Wized variable
     this.Wized.data.v[variableName] = value;
+
+    const paramName = Object.keys(this.paramMap).find(
+      (key) => this.paramMap[key] === variableName
+    );
+    if (paramName) {
+      setParam(paramName, select.value || '');
+    }
     // console.log("FilterSortManager: Updated Wized variable:", variableName, "with value:", value);
 
     // Reset pagination if needed
@@ -227,6 +237,11 @@ export default class FilterSortManager {
     const requestName = select.getAttribute('w-filter-sort-request');
     const isDynamic = !!requestName;
 
+    const paramName = select.getAttribute('wized');
+    if (paramName) {
+      this.paramMap[paramName] = variableName;
+    }
+
     // Find the options wrapper with matching category
     const optionsWrapper = document.querySelector(
       `[w-filter-sort-category="${category}"][w-filter-sort-option="wrapper"]`
@@ -268,6 +283,10 @@ export default class FilterSortManager {
     // Initialize Wized variable if needed
     if (typeof this.Wized.data.v[variableName] === 'undefined') {
       this.Wized.data.v[variableName] = [];
+    }
+
+    if (Array.isArray(this.Wized.data.v[variableName]) && this.Wized.data.v[variableName].length > 0) {
+      select.value = JSON.stringify(this.Wized.data.v[variableName][0]);
     }
 
     // Setup dynamic functionality if needed
@@ -462,6 +481,12 @@ export default class FilterSortManager {
 
       sortSelect.selectedIndex = 0;
       this.Wized.data.v[variableName] = [];
+      const paramName = Object.keys(this.paramMap).find(
+        (key) => this.paramMap[key] === variableName
+      );
+      if (paramName) {
+        setParam(paramName, '');
+      }
       // console.log("FilterSortManager: Reset sort select:", variableName);
       return;
     }
@@ -494,6 +519,12 @@ export default class FilterSortManager {
 
       select.selectedIndex = 0;
       this.Wized.data.v[variableName] = [];
+      const paramName = Object.keys(this.paramMap).find(
+        (key) => this.paramMap[key] === variableName
+      );
+      if (paramName) {
+        setParam(paramName, '');
+      }
       // console.log("FilterSortManager: Reset complete for:", variableName);
     }
   }

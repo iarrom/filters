@@ -57,6 +57,17 @@ global.window = {
     exists: jest.fn(),
     removeByValue: jest.fn(),
   },
+  location: {
+    search: '',
+    pathname: '/',
+    hash: '',
+  },
+  history: {
+    replaceState: jest.fn((_, __, url) => {
+      const parsed = new URL(url, 'http://localhost');
+      global.window.location.search = parsed.search;
+    }),
+  },
 };
 
 // Mock MutationObserver

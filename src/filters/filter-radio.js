@@ -1,6 +1,7 @@
 /**
  * FilterRadioManager: Main class responsible for managing radio-based filtering functionality
- */
+*/
+import { setParam } from '../utils/url-sync.js';
 export default class FilterRadioManager {
   constructor(Wized) {
     console.log('[FilterRadioManager] Initializing...');
@@ -13,6 +14,8 @@ export default class FilterRadioManager {
       hasChipsSupport: false, // Track if chips functionality is available
       isProcessing: false, // Flag to prevent recursive updates
     };
+
+    this.paramMap = {};
 
     // Bind methods
     this.setupFilterMonitoring = this.setupFilterMonitoring.bind(this);
@@ -168,6 +171,13 @@ export default class FilterRadioManager {
       });
 
       this.Wized.data.v[variableName] = value;
+
+      const paramName = Object.keys(this.paramMap).find(
+        (key) => this.paramMap[key] === variableName
+      );
+      if (paramName) {
+        setParam(paramName, value);
+      }
 
       if (paginationVariable) {
         console.log('Resetting pagination to 1');
@@ -378,6 +388,19 @@ export default class FilterRadioManager {
         this.Wized.data.v[variableName] = '';
       }
 
+      if (wizedName) {
+        this.paramMap[wizedName] = variableName;
+      }
+
+      const currentValue = this.Wized.data.v[variableName];
+      if (currentValue) {
+        elements.forEach((radio) => {
+          const label = this.getRadioLabel(radio);
+          const shouldCheck = label === currentValue;
+          this.updateRadioVisualState(radio, shouldCheck);
+        });
+      }
+
       this.setupResetButton(group);
 
       elements.forEach((radio) => {
@@ -459,6 +482,12 @@ export default class FilterRadioManager {
 
       try {
         this.Wized.data.v[variableName] = '';
+        const paramName = Object.keys(this.paramMap).find(
+          (key) => this.paramMap[key] === variableName
+        );
+        if (paramName) {
+          setParam(paramName, '');
+        }
         console.log('[FilterRadioManager] Successfully reset Wized variable:', variableName);
       } catch (error) {
         console.error('[FilterRadioManager] Error resetting Wized variable:', variableName, error);

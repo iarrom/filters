@@ -8,6 +8,7 @@
  * 4. Wized Integration: Coordinates with Wized for data and requests
  * 5. Dynamic Options: Manages dynamic option updates
  */
+import { setParam } from '../utils/url-sync.js';
 export default class FilterSelectRangeManager {
   constructor(Wized) {
     this.Wized = Wized;
@@ -19,6 +20,8 @@ export default class FilterSelectRangeManager {
       processingChange: false, // Prevent multiple simultaneous changes
       dynamicRanges: new Map(), // Track ranges with dynamic options
     };
+
+    this.paramMap = {};
 
     // Bind methods
     this.setupFilterMonitoring = this.setupFilterMonitoring.bind(this);
@@ -306,6 +309,19 @@ export default class FilterSelectRangeManager {
     this.Wized.data.v[fromVariable] = fromValue;
     this.Wized.data.v[toVariable] = toValue;
 
+    const fromParam = Object.keys(this.paramMap).find(
+      (key) => this.paramMap[key] === fromVariable
+    );
+    if (fromParam) {
+      setParam(fromParam, fromValue);
+    }
+    const toParam = Object.keys(this.paramMap).find(
+      (key) => this.paramMap[key] === toVariable
+    );
+    if (toParam) {
+      setParam(toParam, toValue);
+    }
+
     if (isReset || fromValue || toValue || (!forceEmpty && (!fromValue || !toValue))) {
       if (paginationVariable) {
         this.Wized.data.v[paginationVariable] = 1;
@@ -418,12 +434,28 @@ export default class FilterSelectRangeManager {
     const filterRequest = fromSelect.getAttribute('w-filter-request');
     const requestName = fromSelect.getAttribute('w-filter-select-range-request');
 
+    const fromParam = fromSelect.getAttribute('wized');
+    if (fromParam) {
+      this.paramMap[fromParam] = fromVariable;
+    }
+    const toParam = toSelect.getAttribute('wized');
+    if (toParam) {
+      this.paramMap[toParam] = toVariable;
+    }
+
     // Initialize Wized variables if needed
     if (typeof this.Wized.data.v[fromVariable] === 'undefined') {
       this.Wized.data.v[fromVariable] = '';
     }
     if (typeof this.Wized.data.v[toVariable] === 'undefined') {
       this.Wized.data.v[toVariable] = '';
+    }
+
+    if (this.Wized.data.v[fromVariable]) {
+      fromSelect.value = this.Wized.data.v[fromVariable];
+    }
+    if (this.Wized.data.v[toVariable]) {
+      toSelect.value = this.Wized.data.v[toVariable];
     }
 
     this.setupResetButton(
@@ -562,6 +594,19 @@ export default class FilterSelectRangeManager {
       const toVariable = select.getAttribute('w-filter-select-range-to-variable');
       if (fromVariable) this.Wized.data.v[fromVariable] = '';
       if (toVariable) this.Wized.data.v[toVariable] = '';
+
+      if (fromVariable) {
+        const param = Object.keys(this.paramMap).find(
+          (k) => this.paramMap[k] === fromVariable
+        );
+        if (param) setParam(param, '');
+      }
+      if (toVariable) {
+        const param = Object.keys(this.paramMap).find(
+          (k) => this.paramMap[k] === toVariable
+        );
+        if (param) setParam(param, '');
+      }
     });
   }
 }

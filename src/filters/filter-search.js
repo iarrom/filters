@@ -9,6 +9,7 @@
  * 3. Event Handling: Manages input events with debouncing
  * 4. Wized Integration: Coordinates with Wized for data and requests
  */
+import { setParam } from '../utils/url-sync.js';
 class FilterSearchManager {
   constructor(Wized) {
     this.Wized = Wized;
@@ -19,6 +20,8 @@ class FilterSearchManager {
       debounceTimers: new Map(), // Tracks debounce timers for each search input
       initialized: false,
     };
+
+    this.paramMap = {};
 
     // Configuration
     this.config = {
@@ -95,6 +98,12 @@ class FilterSearchManager {
 
     // Update Wized variable
     this.Wized.data.v[variableName] = value;
+    const paramName = Object.keys(this.paramMap).find(
+      (key) => this.paramMap[key] === variableName
+    );
+    if (paramName) {
+      setParam(paramName, value);
+    }
     console.log(`Updated search variable ${variableName} to:`, value);
 
     // Reset pagination if needed
@@ -138,9 +147,18 @@ class FilterSearchManager {
     const paginationVariable = searchInput.getAttribute('w-filter-pagination-current-variable');
     const filterRequest = searchInput.getAttribute('w-filter-request');
 
+    const paramName = searchInput.getAttribute('wized');
+    if (paramName) {
+      this.paramMap[paramName] = variableName;
+    }
+
     // Initialize Wized variable if needed
     if (typeof this.Wized.data.v[variableName] === 'undefined') {
       this.Wized.data.v[variableName] = '';
+    }
+
+    if (this.Wized.data.v[variableName]) {
+      searchInput.value = this.Wized.data.v[variableName];
     }
 
     // Add input handler with debouncing

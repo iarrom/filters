@@ -9,6 +9,7 @@
  * 5. Chips Integration: Coordinates with FilterChipsManager for visual feedback
  * 6. Dynamic Options: Manages dynamic option updates
  */
+import { setParam } from '../utils/url-sync.js';
 export default class FilterSelectManager {
   constructor(Wized) {
     this.Wized = Wized;
@@ -20,6 +21,8 @@ export default class FilterSelectManager {
       processingChange: false, // Prevent multiple simultaneous changes
       dynamicSelects: new Map(), // Track selects with dynamic options
     };
+
+    this.paramMap = {};
 
     // Bind methods
     this.setupFilterMonitoring = this.setupFilterMonitoring.bind(this);
@@ -181,6 +184,13 @@ export default class FilterSelectManager {
     // Update Wized variable
     this.Wized.data.v[variableName] = value;
 
+    const paramName = Object.keys(this.paramMap).find(
+      (key) => this.paramMap[key] === variableName
+    );
+    if (paramName) {
+      setParam(paramName, value);
+    }
+
     // Reset pagination if needed
     if (paginationVariable) {
       this.Wized.data.v[paginationVariable] = 1;
@@ -267,9 +277,18 @@ export default class FilterSelectManager {
     const category = select.getAttribute('w-filter-select-category');
     const isDynamic = !!requestName;
 
+    const paramName = select.getAttribute('wized');
+    if (paramName) {
+      this.paramMap[paramName] = variableName;
+    }
+
     // Initialize Wized variable if needed
     if (typeof this.Wized.data.v[variableName] === 'undefined') {
       this.Wized.data.v[variableName] = '';
+    }
+
+    if (this.Wized.data.v[variableName]) {
+      select.value = this.Wized.data.v[variableName];
     }
 
     // Setup reset functionality
@@ -359,6 +378,12 @@ export default class FilterSelectManager {
       const variableName = select.getAttribute('w-filter-select-variable');
       select.selectedIndex = 0;
       this.Wized.data.v[variableName] = '';
+      const paramName = Object.keys(this.paramMap).find(
+        (key) => this.paramMap[key] === variableName
+      );
+      if (paramName) {
+        setParam(paramName, '');
+      }
     }
   }
 }

@@ -51,6 +51,14 @@ A no-code solution that seamlessly integrates filtering and pagination into your
 - **Debounced Filter Updates** – Prevent unnecessary requests for a smoother experience.
 - **State Management Built-in** – Filters stay in sync without extra setup.
 - **Seamless Infinite Scroll** – Load more content automatically as users scroll.
+- **URL Sync** – Filter selections are stored in the page URL and restored on reload.
+
+## URL Sync Example
+
+When a user selects filters, the choices appear in the page URL and will be applied on reload.
+
+Example:
+`https://example.com/?category=Shoes&color=Red`
   <br><br>
   <br><br>
   <br><br>
