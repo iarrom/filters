@@ -76,6 +76,24 @@ To use **Wized Filter and Pagination**, include the CDN link in the `<head>` tag
 ></script>
 ```
 
+### Self-Hosted Build
+
+If you want to serve the script from your own domain (for example via
+**Cloudflare Pages**), build the library locally:
+
+```bash
+npm install
+npm run build
+```
+
+The build command creates `dist/index.min.js`. Upload the repository (or just
+the generated `dist` folder) to your static hosting and reference the file in
+your HTML:
+
+```html
+<script async type="module" src="/dist/index.min.js"></script>
+```
+
 <br><br>
 <br><br>
 <br><br>
