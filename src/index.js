@@ -23,6 +23,23 @@ export { FilterSearchManager };
 // Initialize components when loaded in browser
 if (typeof window !== 'undefined') {
   window.Wized = window.Wized || [];
+
+  // Polyfill for legacy libraries expecting `Wized.emit`
+  if (
+    typeof window.Wized.emit !== 'function' &&
+    window.Wized.requests &&
+    typeof window.Wized.requests.execute === 'function'
+  ) {
+    window.Wized.emit = (requestName, ...args) => {
+      if (args.length > 0) {
+        console.warn(
+          'Wized.emit provided with additional arguments which are ignored in V2'
+        );
+      }
+      return window.Wized.requests.execute(requestName);
+    };
+  }
+
   window.Wized.push((Wized) => {
     const buildMapping = () => {
       const mapping = {};
