@@ -24,23 +24,49 @@ export { FilterSearchManager };
 if (typeof window !== 'undefined') {
   window.Wized = window.Wized || [];
 
-  // Polyfill for legacy libraries expecting `Wized.emit`
-  if (
-    typeof window.Wized.emit !== 'function' &&
-    window.Wized.requests &&
-    typeof window.Wized.requests.execute === 'function'
-  ) {
-    window.Wized.emit = (requestName, ...args) => {
-      if (args.length > 0) {
-        console.warn(
-          'Wized.emit provided with additional arguments which are ignored in V2'
-        );
-      }
-      return window.Wized.requests.execute(requestName);
-    };
-  }
+  const initLibrary = (Wized) => {
+    // Polyfill for legacy libraries expecting `Wized.emit`
+    if (
+      typeof Wized.emit !== 'function' &&
+      Wized.requests &&
+      typeof Wized.requests.execute === 'function'
+    ) {
+      Wized.emit = (requestName, ...args) => {
+        if (args.length > 0) {
+          console.warn(
+            'Wized.emit provided with additional arguments which are ignored in V2'
+          );
+        }
+        return Wized.requests.execute(requestName);
+      };
+    }
 
-  window.Wized.push((Wized) => {
+    // Polyfill for legacy libraries expecting `Wized.on`
+    if (
+      typeof Wized.on !== 'function' &&
+      Wized.requests &&
+      typeof Wized.requests.execute === 'function'
+    ) {
+      const listeners = { requestend: [] };
+      const originalExecute = Wized.requests.execute.bind(Wized.requests);
+      Wized.on = (event, cb) => {
+        if (event === 'requestend' && typeof cb === 'function') {
+          listeners.requestend.push(cb);
+        }
+      };
+      Wized.requests.execute = async (...args) => {
+        const result = await originalExecute(...args);
+        listeners.requestend.forEach((fn) => {
+          try {
+            fn(result);
+          } catch (e) {
+            console.error(e);
+          }
+        });
+        return result;
+      };
+    }
+
     const buildMapping = () => {
       const mapping = {};
       document.querySelectorAll('[wized][w-filter-checkbox-variable]').forEach((el) => {
@@ -87,5 +113,11 @@ if (typeof window !== 'undefined') {
 
     // Initialize reset manager last since it depends on other managers being ready
     new FilterResetManager(Wized);
-  });
+  };
+
+  if (Array.isArray(window.Wized)) {
+    window.Wized.push(initLibrary);
+  } else {
+    initLibrary(window.Wized);
+  }
 }
