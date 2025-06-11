@@ -1,25 +1,13 @@
 /* global describe, test, expect, beforeEach */
 import { setParam, applyParamsToWized } from '../../utils/url-sync';
+import Wized from '../../__mocks__/wized';
 import FilterSearchManager from '../../filters/filter-search';
-
-let Wized;
 
 describe('URL Sync', () => {
   beforeEach(() => {
-    window.location = { search: '', pathname: '/', hash: '' };
-    if (typeof window.history.replaceState?.mockClear === 'function') {
-      window.history.replaceState.mockClear();
-    } else {
-      window.history.replaceState = jest.fn((_, __, url) => {
-        const parsed = new URL(url, 'http://localhost');
-        window.location.search = parsed.search;
-      });
-    }
-    Wized = {
-      data: { v: {}, r: {}, subscribe: jest.fn() },
-      requests: { execute: jest.fn() },
-      on: jest.fn(),
-    };
+    window.location.search = '';
+    window.history.replaceState.mockClear();
+    Wized.data.v = {};
   });
 
   test('changing search filter updates location search', async () => {
@@ -39,16 +27,12 @@ describe('URL Sync', () => {
     manager.setupSearch(input);
 
     await manager.updateWizedVariable(input, 'searchVar', 'page', 'req');
-    expect(window.history.replaceState).toHaveBeenCalled();
-    const urlArg = window.history.replaceState.mock.calls[0][2];
-    expect(urlArg).toContain('?search=shoes');
+    expect(window.location.search).toBe('?search=shoes');
   });
 
   test('applyParamsToWized populates variables from URL', () => {
-    const originalWindow = global.window;
-    global.window = {};
-    applyParamsToWized(Wized, { search: 'searchVar' }, '?search=boots');
-    global.window = originalWindow;
+    window.location.search = '?search=boots';
+    applyParamsToWized(Wized, { search: 'searchVar' });
     expect(Wized.data.v.searchVar).toBe('boots');
   });
 });
