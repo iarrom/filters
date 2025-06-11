@@ -49,10 +49,9 @@ function parseValue(val) {
   return trimmed;
 }
 
-export function applyParamsToWized(Wized, mapping = {}, searchOverride = null) {
-  if (typeof window === 'undefined' && !searchOverride) return;
-  const search = searchOverride ?? (window.location ? window.location.search : '');
-  const params = new URLSearchParams(search);
+export function applyParamsToWized(Wized, mapping = {}) {
+  if (typeof window === 'undefined') return;
+  const params = new URLSearchParams(window.location.search);
   for (const [param, variable] of Object.entries(mapping)) {
     if (params.has(param)) {
       const raw = params.get(param);
