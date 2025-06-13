@@ -115,9 +115,17 @@ if (typeof window !== 'undefined') {
     new FilterResetManager(Wized);
   };
 
-  if (Array.isArray(window.Wized)) {
-    window.Wized.push(initLibrary);
+  const runInit = () => {
+    if (Array.isArray(window.Wized)) {
+      window.Wized.push(initLibrary);
+    } else {
+      initLibrary(window.Wized);
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runInit);
   } else {
-    initLibrary(window.Wized);
+    runInit();
   }
 }
