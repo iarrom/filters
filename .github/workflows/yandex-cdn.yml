@@ -1,0 +1,50 @@
+name: Upload to Yandex CDN
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      - name: Clean install dependencies
+        run: npm ci
+
+      - name: Build package
+        run: |
+          npm run clean
+          npm run build
+
+      - name: Install Yandex Cloud CLI
+        run: |
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash -s -- -i $HOME/yandex-cloud
+          echo "$HOME/yandex-cloud/yandex-cloud/bin" >> $GITHUB_PATH
+
+      - name: Authenticate Yandex Cloud
+        run: |
+          echo '${{ secrets.YC_SERVICE_ACCOUNT }}' > key.json
+          yc config profile create github-actions --non-interactive
+          yc config set service-account-key key.json
+
+      - name: Upload dist to Object Storage
+        run: yc storage cp --recursive dist s3://${{ secrets.YC_BUCKET }}/
+
+      - name: Purge CDN cache (optional)
+        if: env.YC_CDN_RESOURCE_ID != ''
+        run: yc cdn cache purge --resource-id $YC_CDN_RESOURCE_ID --path '/'
+        env:
+          YC_CDN_RESOURCE_ID: ${{ secrets.YC_CDN_RESOURCE_ID }}
+
