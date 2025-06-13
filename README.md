@@ -510,3 +510,15 @@ For support, please:
 - **📖 Check the Documentation** – Refer to the official [documentation](https://github.com/aonnoy/wized-filter-pagination) for setup instructions and troubleshooting.
 - **🐞 Open an Issue** – If you encounter a bug or need assistance, submit an [issue](https://github.com/aonnoy/wized-filter-pagination/issues) on GitHub.
 - **📧 Contact Me** – You can reach me via email at [hello@aonnoysengupta.com](mailto:hello@aonnoysengupta.com) or connect with me on Discord (**aonnoy5683**).
+
+## GitHub Action: Yandex CDN Deployment
+
+This repository includes a workflow (`.github/workflows/yandex-cdn.yml`) that uploads the contents of the `dist` directory to a Yandex Object Storage bucket. The files can then be served via Yandex CDN.
+
+### Required Secrets
+
+- `YC_BUCKET` – name of the Object Storage bucket used as the CDN origin.
+- `YC_SERVICE_ACCOUNT` – JSON key for a service account with write access to the bucket.
+- `YC_CDN_RESOURCE_ID` – *(optional)* CDN resource ID used for cache purge after upload.
+
+The workflow triggers on pushes to the `main` branch or when a release tag is created. It installs the Yandex Cloud CLI, builds the project, synchronizes `dist/` with the specified bucket, and purges the CDN cache if a resource ID is provided.
