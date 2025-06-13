@@ -37,7 +37,7 @@ jobs:
       - name: Authenticate Yandex Cloud
         run: |
           echo '${{ secrets.YC_SERVICE_ACCOUNT }}' > key.json
-          yc config profile create github-actions --non-interactive
+          yc --non-interactive config profile create github-actions
           yc config set service-account-key key.json
 
       - name: Upload dist to Object Storage
