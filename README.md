@@ -522,3 +522,7 @@ This repository includes a workflow (`.github/workflows/yandex-cdn.yml`) that up
 - `YC_CDN_RESOURCE_ID` – *(optional)* CDN resource ID used for cache purge after upload.
 
 The workflow triggers on pushes to the `main` branch or when a release tag is created. It installs the Yandex Cloud CLI, builds the project, synchronizes `dist/` with the specified bucket, and purges the CDN cache if a resource ID is provided.
+
+### Correct MIME Types
+
+Ensure JavaScript files are uploaded with `Content-Type: application/javascript` so browsers load them as ES modules. The workflow handles this automatically for `*.js` files.
