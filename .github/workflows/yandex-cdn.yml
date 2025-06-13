@@ -42,7 +42,7 @@ jobs:
           yc config set service-account-key key.json
 
       - name: Upload dist to Object Storage
-        run: yc storage cp --recursive dist s3://${{ secrets.YC_BUCKET }}/
+        run: yc storage s3 cp --recursive dist s3://${{ secrets.YC_BUCKET }}/
 
       - name: Purge CDN cache (optional)
         if: env.YC_CDN_RESOURCE_ID != ''
