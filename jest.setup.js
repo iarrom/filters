@@ -1,4 +1,4 @@
-/* global global, jest, expect */
+/* global jest, expect */
 
 // Mock the Wized global object
 global.Wized = {

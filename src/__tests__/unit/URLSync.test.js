@@ -1,4 +1,4 @@
-/* global describe, test, expect, beforeEach */
+/* global describe, test, expect, beforeEach, jest */
 import { setParam, applyParamsToWized } from '../../utils/url-sync';
 import FilterSearchManager from '../../filters/filter-search';
 
@@ -47,11 +47,7 @@ describe('URL Sync', () => {
   test('applyParamsToWized populates variables from URL', () => {
     const originalWindow = global.window;
     global.window = {};
-    applyParamsToWized(
-      Wized,
-      { search: { variable: 'searchVar' } },
-      '?search=boots'
-    );
+    applyParamsToWized(Wized, { search: { variable: 'searchVar' } }, '?search=boots');
     global.window = originalWindow;
     expect(Wized.data.v.searchVar).toBe('boots');
   });

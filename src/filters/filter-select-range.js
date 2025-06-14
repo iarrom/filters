@@ -309,15 +309,11 @@ export default class FilterSelectRangeManager {
     this.Wized.data.v[fromVariable] = fromValue;
     this.Wized.data.v[toVariable] = toValue;
 
-    const fromParam = Object.keys(this.paramMap).find(
-      (key) => this.paramMap[key] === fromVariable
-    );
+    const fromParam = Object.keys(this.paramMap).find((key) => this.paramMap[key] === fromVariable);
     if (fromParam) {
       setParam(fromParam, fromValue);
     }
-    const toParam = Object.keys(this.paramMap).find(
-      (key) => this.paramMap[key] === toVariable
-    );
+    const toParam = Object.keys(this.paramMap).find((key) => this.paramMap[key] === toVariable);
     if (toParam) {
       setParam(toParam, toValue);
     }
@@ -596,15 +592,11 @@ export default class FilterSelectRangeManager {
       if (toVariable) this.Wized.data.v[toVariable] = '';
 
       if (fromVariable) {
-        const param = Object.keys(this.paramMap).find(
-          (k) => this.paramMap[k] === fromVariable
-        );
+        const param = Object.keys(this.paramMap).find((k) => this.paramMap[k] === fromVariable);
         if (param) setParam(param, '');
       }
       if (toVariable) {
-        const param = Object.keys(this.paramMap).find(
-          (k) => this.paramMap[k] === toVariable
-        );
+        const param = Object.keys(this.paramMap).find((k) => this.paramMap[k] === toVariable);
         if (param) setParam(param, '');
       }
     });

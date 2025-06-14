@@ -157,9 +157,7 @@ class FilterCheckboxManager {
 
     this.Wized.data.v[variableName] = checkedValues;
 
-    const paramName = Object.keys(this.paramMap).find(
-      (key) => this.paramMap[key] === variableName
-    );
+    const paramName = Object.keys(this.paramMap).find((key) => this.paramMap[key] === variableName);
     if (paramName) {
       setParam(paramName, checkedValues);
     }
