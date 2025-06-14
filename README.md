@@ -76,9 +76,9 @@ To use **Wized Filter and Pagination**, include the CDN link in the `<head>` tag
 
 ### Wized Initialization
 
-Wait for Wized to load before running the library. If Wized is not loaded yet,
-it exposes an array that queues callbacks. Push a function to this array and it
-will execute once Wized is ready:
+The library automatically waits until Wized is fully loaded. If you need to
+run custom logic once Wized is ready, you can still push a callback to the
+`window.Wized` queue:
 
 ```html
 <script>

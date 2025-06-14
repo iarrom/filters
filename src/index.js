@@ -24,6 +24,42 @@ export { FilterSearchManager };
 if (typeof window !== 'undefined') {
   window.Wized = window.Wized || [];
 
+  const waitForWized = () =>
+    new Promise((resolve) => {
+      if (
+        window.Wized &&
+        typeof window.Wized === 'object' &&
+        window.Wized.data &&
+        window.Wized.requests
+      ) {
+        resolve(window.Wized);
+        return;
+      }
+
+      let intervalId;
+      const ready = (WizedInstance) => {
+        clearInterval(intervalId);
+        resolve(WizedInstance);
+      };
+
+      intervalId = setInterval(() => {
+        if (
+          window.Wized &&
+          typeof window.Wized === 'object' &&
+          window.Wized.data &&
+          window.Wized.requests
+        ) {
+          ready(window.Wized);
+        }
+      }, 50);
+
+      if (Array.isArray(window.Wized)) {
+        window.Wized.push(ready);
+      } else if (typeof window.Wized === 'function') {
+        window.Wized(ready);
+      }
+    });
+
   const initLibrary = (Wized) => {
     // Polyfill for legacy libraries expecting `Wized.emit`
     if (
@@ -138,13 +174,5 @@ if (typeof window !== 'undefined') {
     }
   };
 
-  if (Array.isArray(window.Wized)) {
-    // Queue the initializer until Wized loads
-    window.Wized.push((WizedInstance) => startLibrary(WizedInstance));
-  } else if (typeof window.Wized === 'function') {
-    // Wized initialization snippet provides a function for queuing callbacks
-    window.Wized((Wized) => startLibrary(Wized));
-  } else {
-    startLibrary(window.Wized);
-  }
+  waitForWized().then((WizedInstance) => startLibrary(WizedInstance));
 }
