@@ -53,10 +53,22 @@ export function applyParamsToWized(Wized, mapping = {}, searchOverride = null) {
   if (typeof window === 'undefined' && !searchOverride) return;
   const search = searchOverride ?? (window.location ? window.location.search : '');
   const params = new URLSearchParams(search);
-  for (const [param, variable] of Object.entries(mapping)) {
-    if (params.has(param)) {
-      const raw = params.get(param);
-      Wized.data.v[variable] = parseValue(raw);
+  for (const [param, config] of Object.entries(mapping)) {
+    if (!params.has(param)) continue;
+    const raw = params.get(param);
+    const value = parseValue(raw);
+    const variable = typeof config === 'string' ? config : config.variable;
+    const isArray = typeof config === 'object' && config.isArray;
+    if (isArray) {
+      if (Array.isArray(value)) {
+        Wized.data.v[variable] = value;
+      } else if (value === '' || value === null || value === undefined) {
+        Wized.data.v[variable] = [];
+      } else {
+        Wized.data.v[variable] = [value];
+      }
+    } else {
+      Wized.data.v[variable] = value;
     }
   }
 }

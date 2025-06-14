@@ -67,35 +67,50 @@ if (typeof window !== 'undefined') {
       };
     }
 
-    const buildMapping = () => {
-      const mapping = {};
-      document.querySelectorAll('[wized][w-filter-checkbox-variable]').forEach((el) => {
-        mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-checkbox-variable');
-      });
-      document.querySelectorAll('[wized][w-filter-radio-variable]').forEach((el) => {
-        mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-radio-variable');
-      });
-      document.querySelectorAll('[wized][w-filter-select-variable]').forEach((el) => {
-        mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-select-variable');
-      });
-      document
-        .querySelectorAll('[wized][w-filter-select-range-from-variable]')
-        .forEach((el) => {
-          mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-select-range-from-variable');
+      const buildMapping = () => {
+        const mapping = {};
+        document.querySelectorAll('[wized][w-filter-checkbox-variable]').forEach((el) => {
+          mapping[el.getAttribute('wized')] = {
+            variable: el.getAttribute('w-filter-checkbox-variable'),
+            isArray: true,
+          };
         });
-      document
-        .querySelectorAll('[wized][w-filter-select-range-to-variable]')
-        .forEach((el) => {
-          mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-select-range-to-variable');
+        document.querySelectorAll('[wized][w-filter-radio-variable]').forEach((el) => {
+          mapping[el.getAttribute('wized')] = {
+            variable: el.getAttribute('w-filter-radio-variable'),
+          };
         });
-      document.querySelectorAll('[wized][w-filter-sort-variable]').forEach((el) => {
-        mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-sort-variable');
-      });
-      document.querySelectorAll('[wized][w-filter-search-variable]').forEach((el) => {
-        mapping[el.getAttribute('wized')] = el.getAttribute('w-filter-search-variable');
-      });
-      return mapping;
-    };
+        document.querySelectorAll('[wized][w-filter-select-variable]').forEach((el) => {
+          mapping[el.getAttribute('wized')] = {
+            variable: el.getAttribute('w-filter-select-variable'),
+          };
+        });
+        document
+          .querySelectorAll('[wized][w-filter-select-range-from-variable]')
+          .forEach((el) => {
+            mapping[el.getAttribute('wized')] = {
+              variable: el.getAttribute('w-filter-select-range-from-variable'),
+            };
+          });
+        document
+          .querySelectorAll('[wized][w-filter-select-range-to-variable]')
+          .forEach((el) => {
+            mapping[el.getAttribute('wized')] = {
+              variable: el.getAttribute('w-filter-select-range-to-variable'),
+            };
+          });
+        document.querySelectorAll('[wized][w-filter-sort-variable]').forEach((el) => {
+          mapping[el.getAttribute('wized')] = {
+            variable: el.getAttribute('w-filter-sort-variable'),
+          };
+        });
+        document.querySelectorAll('[wized][w-filter-search-variable]').forEach((el) => {
+          mapping[el.getAttribute('wized')] = {
+            variable: el.getAttribute('w-filter-search-variable'),
+          };
+        });
+        return mapping;
+      };
 
     applyParamsToWized(Wized, buildMapping());
 
