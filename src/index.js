@@ -113,6 +113,12 @@ if (typeof window !== 'undefined') {
       };
 
     applyParamsToWized(Wized, buildMapping());
+    // Re-apply URL parameters whenever new elements are injected after a request
+    if (typeof Wized.on === 'function') {
+      Wized.on('requestend', () => {
+        applyParamsToWized(Wized, buildMapping());
+      });
+    }
 
     // Initialize chips manager first since other managers depend on it
     new FilterChipsManager(Wized);
