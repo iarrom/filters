@@ -139,7 +139,11 @@ if (typeof window !== 'undefined') {
   };
 
   if (Array.isArray(window.Wized)) {
-    window.Wized.push(startLibrary);
+    // Queue the initializer until Wized loads
+    window.Wized.push((WizedInstance) => startLibrary(WizedInstance));
+  } else if (typeof window.Wized === 'function') {
+    // Wized initialization snippet provides a function for queuing callbacks
+    window.Wized((Wized) => startLibrary(Wized));
   } else {
     startLibrary(window.Wized);
   }

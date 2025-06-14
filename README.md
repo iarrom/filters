@@ -74,6 +74,21 @@ To use **Wized Filter and Pagination**, include the CDN link in the `<head>` tag
 ></script>
 ```
 
+### Wized Initialization
+
+Wait for Wized to load before running the library. If Wized is not loaded yet,
+it exposes an array that queues callbacks. Push a function to this array and it
+will execute once Wized is ready:
+
+```html
+<script>
+  window.Wized = window.Wized || [];
+  window.Wized.push((Wized) => {
+    console.log('Wized is ready', Wized);
+  });
+</script>
+```
+
 ### Self-Hosted Build
 
 If you want to serve the script from your own domain (for example via
