@@ -17,6 +17,8 @@ export default [
         require: true,
         process: true,
         setTimeout: true,
+        setInterval: true,
+        clearInterval: true,
         IntersectionObserver: true,
         URL: true,
         URLSearchParams: true,
