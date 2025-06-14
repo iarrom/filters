@@ -2,20 +2,31 @@ import * as esbuild from 'esbuild';
 
 async function build() {
   try {
-    // Bundle and minify
-    const result = await esbuild.build({
+    const commonOptions = {
       entryPoints: ['src/index.js'],
       bundle: true,
-      minify: true,
       format: 'esm',
       target: ['es2020'],
-      outfile: 'dist/index.min.js',
-      sourcemap: false,
       platform: 'browser',
       define: {
         'process.env.NODE_ENV': '"production"',
       },
       pure: ['console.log', 'console.info', 'console.debug'],
+      sourcemap: false,
+    };
+
+    // Minified bundle for browsers
+    await esbuild.build({
+      ...commonOptions,
+      minify: true,
+      outfile: 'dist/index.min.js',
+    });
+
+    // ESM bundle for bundlers
+    await esbuild.build({
+      ...commonOptions,
+      minify: false,
+      outfile: 'dist/index.esm.js',
     });
 
     console.log('Build completed successfully!');
