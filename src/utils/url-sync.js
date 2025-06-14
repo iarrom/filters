@@ -1,7 +1,12 @@
 export function setParam(key, value) {
   if (typeof window === 'undefined') return;
   const params = new URLSearchParams(window.location.search);
-  if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === '' ||
+    (Array.isArray(value) && value.length === 0)
+  ) {
     params.delete(key);
   } else {
     const encoded = Array.isArray(value) ? value.join(',') : value;

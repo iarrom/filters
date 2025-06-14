@@ -98,9 +98,7 @@ class FilterSearchManager {
 
     // Update Wized variable
     this.Wized.data.v[variableName] = value;
-    const paramName = Object.keys(this.paramMap).find(
-      (key) => this.paramMap[key] === variableName
-    );
+    const paramName = Object.keys(this.paramMap).find((key) => this.paramMap[key] === variableName);
     if (paramName) {
       setParam(paramName, value);
     }

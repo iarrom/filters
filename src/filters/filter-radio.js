@@ -1,6 +1,6 @@
 /**
  * FilterRadioManager: Main class responsible for managing radio-based filtering functionality
-*/
+ */
 import { setParam } from '../utils/url-sync.js';
 export default class FilterRadioManager {
   constructor(Wized) {

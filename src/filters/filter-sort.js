@@ -153,9 +153,7 @@ export default class FilterSortManager {
     // Update Wized variable
     this.Wized.data.v[variableName] = value;
 
-    const paramName = Object.keys(this.paramMap).find(
-      (key) => this.paramMap[key] === variableName
-    );
+    const paramName = Object.keys(this.paramMap).find((key) => this.paramMap[key] === variableName);
     if (paramName) {
       setParam(paramName, select.value || '');
     }
@@ -285,7 +283,10 @@ export default class FilterSortManager {
       this.Wized.data.v[variableName] = [];
     }
 
-    if (Array.isArray(this.Wized.data.v[variableName]) && this.Wized.data.v[variableName].length > 0) {
+    if (
+      Array.isArray(this.Wized.data.v[variableName]) &&
+      this.Wized.data.v[variableName].length > 0
+    ) {
       select.value = JSON.stringify(this.Wized.data.v[variableName][0]);
     }
 

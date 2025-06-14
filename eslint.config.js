@@ -18,6 +18,9 @@ export default [
         process: true,
         setTimeout: true,
         IntersectionObserver: true,
+        URL: true,
+        URLSearchParams: true,
+        global: true,
       },
     },
     rules: {
