@@ -1,5 +1,3 @@
-![Cover Image for Wized Filter and Pagination](https://cdn.prod.website-files.com/657244ba4d804c29a2ef5ce0/67b9e4c67d2fe311fdd5b011_Youtube%20Cover.png)
-
 # Wized Filter and Pagination
 
 A no-code solution that seamlessly integrates filtering and pagination into your Webflow, Wized, and Xano projects. By simply adding attributes to your Webflow filters and configuring requests and elements in Wized, you can set up a fully functional system in minutes—saving you hours of development time.
@@ -72,7 +70,7 @@ To use **Wized Filter and Pagination**, include the CDN link in the `<head>` tag
 <script
   async
   type="module"
-  src="https://cdn.jsdelivr.net/npm/wized-filter-and-pagination@1/dist/index.min.js"
+  src="https://filters.storage.yandexcloud.net/index.min.js"
 ></script>
 ```
 
