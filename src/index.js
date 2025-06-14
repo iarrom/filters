@@ -130,9 +130,17 @@ if (typeof window !== 'undefined') {
     new FilterResetManager(Wized);
   };
 
+  const startLibrary = (WizedInstance) => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => initLibrary(WizedInstance));
+    } else {
+      initLibrary(WizedInstance);
+    }
+  };
+
   if (Array.isArray(window.Wized)) {
-    window.Wized.push(initLibrary);
+    window.Wized.push(startLibrary);
   } else {
-    initLibrary(window.Wized);
+    startLibrary(window.Wized);
   }
 }
